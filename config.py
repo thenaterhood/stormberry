@@ -2,32 +2,30 @@
     Raspberry Pi + Raspbian Weather Station
     By Uladzislau Bayouski
     https://www.linkedin.com/in/uladzislau-bayouski-a7474111b/
-    
+
     Configuration package.
 ********************************************************************************************************************'''
+import configparser
 
-class Config:
+
+class Config(configparser.ConfigParser):
     """Configuration class for Weather Station"""
 
-    # Weather Undeground configuration
-    STATION_ID = 'YOUR_STATION_ID'
-    STATION_KEY = 'YOUR_STATION_KEY'
-    WU_URL = 'http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php'
+    def __init__(self, configfile="config.ini"):
+        super(Config, self).__init__()
+        self.read(configfile)
 
-    # Runtime configuration
-    WEATHER_UPLOAD = True
-    UPLOAD_INTERVAL = 600 # in seconds
-    LOG_TO_CONSOLE = False
-    LOG_INTERVAL = 5 # in seconds
-    UPDATE_DISPLAY = True
-    UPDATE_INTERVAL = 60 # in seconds
+    def gettuple(self, section, attr):
+        value = self.get(section, attr)
+        if (value.startswith('(') and value.endswith(')')):
+            string_data = value[1:-1]
+            exploded = string_data.split(",")
+            return tuple(exploded)
+        else:
+            raise TypeError("requested value could not be parsed to a tuple")
 
-    # Visual styles configuration
-    TEMP_POSITIVE = (255, 0, 0)    # red
-    TEMP_NEGATIVE = (0, 0, 255)    # blue
-    HUM_POSITIVE = (0, 255, 0)     # green
-    HUM_NEGATIVE = (255, 255, 255) # white
-    PRESS_POSITIVE = (148, 0, 211)  # purple
-    PRESS_NEGATIVE = (255, 140, 0)   # orange
-    SCROLL_TEXT = True
-    SCROLL_TEXT_SPEED = .05
+    def getinttuple(self, section, attr):
+        str_tuple = self.gettuple(section, attr)
+        int_tuple = [int(x) for x in str_tuple]
+        return tuple(int_tuple)
+

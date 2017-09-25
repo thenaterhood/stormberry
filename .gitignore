@@ -48,3 +48,7 @@ Temporary Items
 
 # Visual Studion
 *.pyproj
+
+# Python
+*.pyc
+*.log

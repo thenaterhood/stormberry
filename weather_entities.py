@@ -70,7 +70,8 @@ class WeatherEntity(CarouselContainer):
     """Base class for weather entities implementations."""
     __metaclass__ = ABCMeta
 
-    def __init__(self):
+    def __init__(self, config=None):
+        self.config = config if config is not None else Config()
         super(WeatherEntity, self).__init__()
 
         # Default set of visual styles for weather entity instance
@@ -125,11 +126,11 @@ class HumidityEntity(WeatherEntity):
 
     @property
     def positive_color(self):
-        return Config.HUM_POSITIVE
+        return self.config.getinttuple('GENERAL', 'HUM_POSITIVE')
 
     @property
     def negative_color(self):
-        return Config.HUM_NEGATIVE
+        return self.config.getinttuple('GENERAL', 'HUM_NEGATIVE')
 
     @property
     def entity_type(self):
@@ -155,11 +156,11 @@ class PressureEntity(WeatherEntity):
 
     @property
     def positive_color(self):
-        return Config.PRESS_POSITIVE
+        return self.config.getinttuple('GENERAL', 'PRESS_POSITIVE')
 
     @property
     def negative_color(self):
-        return Config.PRESS_NEGATIVE
+        return self.config.getinttuple('GENERAL', 'PRESS_NEGATIVE')
 
     @property
     def entity_type(self):
@@ -177,11 +178,11 @@ class TemperatureEntity(WeatherEntity):
 
     @property
     def positive_color(self):
-        return Config.TEMP_POSITIVE
+        return self.config.getinttuple('GENERAL', 'TEMP_POSITIVE')
 
     @property
     def negative_color(self):
-        return Config.TEMP_NEGATIVE
+        return self.config.getinttuple('GENERAL', 'TEMP_NEGATIVE')
 
     @property
     def entity_type(self):
