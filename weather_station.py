@@ -23,6 +23,7 @@ import os
 import signal
 import sys
 import time
+from storage_strategy.csv import CSVWriter
 
 from config import Config
 from weather_entities import DEFAULT_WEATHER_ENTITIES, CarouselContainer, WeatherEntityType
@@ -43,8 +44,11 @@ class WeatherStation(CarouselContainer):
         self._upload_timer = None
         self._update_timer = None
         self._last_readings = None
-        self.storage_strategy = None
         self.config = config if config is not None else Config()
+        self.init_datastore()
+
+    def init_datastore(self):
+        self.storage_strategy = CSVWriter(self.config)
 
     @property
     def carousel_items(self):
@@ -123,11 +127,9 @@ class WeatherStation(CarouselContainer):
         # avg_temp becomes the average of the temperatures from both sensors
         # We need to check for pressure_temp value is not 0, to not ruin avg_temp calculation
         avg_temp = (humidity_temp + pressure_temp) / 2 if pressure_temp else humidity_temp
-        print(avg_temp)
         
         # Get the CPU temperature
         cpu_temp = self._get_cpu_temp()
-        print(cpu_temp) 
         # Calculate temperature compensating for CPU heating
         adj_temp = avg_temp - ((cpu_temp - avg_temp) / 1.5)
         

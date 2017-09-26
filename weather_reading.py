@@ -31,12 +31,16 @@ class WeatherReading():
         return self.__date
 
     @property
+    def timestr(self):
+        return self.__date.strftime("%Y-%m-%d %H:%M:%S")
+
+    @property
     def dewpoint(self):
         """
         Calculates dewpoint in celsius, uses simplified formula less accurate but obvious.
         https://en.wikipedia.org/wiki/Dew_point#Calculating_the_dew_point
         """
-        return self.__tempf - (100 - self.__humidity) / 5
+        return self.__tempc - (100 - self.__humidity) / 5
 
     @property
     def tuple(self):

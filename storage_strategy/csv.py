@@ -1,40 +1,35 @@
-import urllib2
 import logging
-from urllib import urlencode
+from storage_strategy import GenericStorageStrategy
+import csv
+import os
 
 
-class CSVWriter():
+class CSVWriter(GenericStorageStrategy):
 
-    def store_results(self, data, first_time=False):
-        """Internal. Continuously uploads new sensors values to Weather Underground."""
+    def save_data(self, data, first_time=False):
 
-        sensors_data = data.tuple
+        behaviour = self.config['CSV']['BEHAVIOUR']
+        filename = self.config['CSV']['FILENAME']
 
-        if not first_time:
-            print('Uploading data to Weather Underground')
+        csv_file_exists = os.path.exists(filename)
 
-            # Build a weather data object http://wiki.wunderground.com/index.php/PWS_-_Upload_Protocol
-            weather_data = {
-                'action': 'updateraw',
-                'ID': Config.STATION_ID,
-                'PASSWORD': Config.STATION_KEY,
-                'dateutc': 'now',
-                'tempf': str(sensors_data[1]),
-                'humidity': str(sensors_data[2]),
-                'baromin': str(sensors_data[3]),
-                'dewptf': str(self.to_fahrenheit(self.calculate_dew_point(sensors_data[0], sensors_data[2])))
-            }
+        if csv_file_exists and behaviour == "overwrite":
+            os.unlink(filename)
+            csv_file_exists = False
 
-            try:
-                upload_url = Config.WU_URL + '?' + urlencode(weather_data)
-                response = urllib2.urlopen(upload_url)
-                html = response.read()
-                print('Server response: ', html)
-                
-                # Close response object
-                response.close()
-            except:
-                print('Could not upload to Weather Underground')
-                logging.warning('Could not upload to Weather Underground', exc_info=True)
+        with open(filename, 'a') as csv_file:
+            fieldnames = ["timestamp", "tempc", "tempf", "humidity", "pressure_inHg", "dewpoint"]
+            writer = csv.DictWriter(csv_file, fieldnames)
 
+            if not csv_file_exists:
+                writer.writeheader()
+
+            writer.writerow({
+                'tempc': data.tempc,
+                'tempf': data.tempf,
+                'timestamp': data.timestr,
+                'humidity': data.humidity,
+                'pressure_inHg': data.pressure_inHg,
+                'dewpoint': data.dewpoint
+                })
 

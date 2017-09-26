@@ -1,9 +1,10 @@
 import urllib2
 import logging
+import GenericStorageStrategy
 from urllib import urlencode
 
 
-class WundergroundUploader():
+class WundergroundUploader(GenericStorageStrategy):
 
     def store_results(self, data, first_time=False):
         """Internal. Continuously uploads new sensors values to Weather Underground."""
