@@ -18,7 +18,7 @@ class CSVWriter(GenericStorageStrategy):
             csv_file_exists = False
 
         with open(filename, 'a') as csv_file:
-            fieldnames = ["timestamp", "tempc", "tempf", "humidity", "pressure_inHg", "dewpoint"]
+            fieldnames = ["timestamp", "tempc", "tempf", "humidity", "pressure_inHg", "dewpointc"]
             writer = csv.DictWriter(csv_file, fieldnames)
 
             if not csv_file_exists:
@@ -30,6 +30,6 @@ class CSVWriter(GenericStorageStrategy):
                 'timestamp': data.timestr,
                 'humidity': data.humidity,
                 'pressure_inHg': data.pressure_inHg,
-                'dewpoint': data.dewpoint
+                'dewpointc': data.dewpointc
                 })
 

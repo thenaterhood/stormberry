@@ -24,6 +24,7 @@ import signal
 import sys
 import time
 from storage_strategy.csv import CSVWriter
+from storage_strategy.echo import Echoer
 
 from config import Config
 from weather_entities import DEFAULT_WEATHER_ENTITIES, CarouselContainer, WeatherEntityType
@@ -48,7 +49,7 @@ class WeatherStation(CarouselContainer):
         self.init_datastore()
 
     def init_datastore(self):
-        self.storage_strategy = CSVWriter(self.config)
+        self.storage_strategy = [CSVWriter(self.config), Echoer(self.config)]
 
     @property
     def carousel_items(self):
@@ -216,7 +217,8 @@ class WeatherStation(CarouselContainer):
 
         data = self.get_sensors_data()
         if self.storage_strategy is not None:
-            self.storage_strategy.save_data(data, first_time)
+            for s in self.storage_strategy:
+                s.save_data(data, first_time)
 
         self._upload_timer = self._start_timer(self.config.getint("GENERAL", "UPLOAD_INTERVAL"), self._upload_results)
 
@@ -262,22 +264,12 @@ if __name__ == '__main__':
         level=logging.WARNING
     )
 
-    #  Read Weather Underground Configuration Parameters
-    if config.get("GENERAL", "STATION_ID") is None or config.get("GENERAL", "STATION_KEY") is None:
-        print('Missing values from the Weather Underground configuration file\n')
-        logging.warning('Missing values from the Weather Underground configuration file')
-
-        sys.exit(1)
-
     # Make sure we don't have an upload interval more than 3600 seconds
     if config.getint("GENERAL", "UPLOAD_INTERVAL") > 3600:
         print('The application\'s upload interval cannot be greater than 3600 seconds')
         logging.warning('The application\'s upload interval cannot be greater than 3600 seconds')
 
         sys.exit(1)
-
-    print('Successfully read Weather Underground configuration values')
-    print('Station ID: ', config.get("GENERAL", "STATION_ID"))
 
     def _terminate_application(signal=None, frame=None):
         """Nested. Internal. Tries to terminate weather station and make a clean up."""
