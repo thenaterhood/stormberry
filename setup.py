@@ -12,6 +12,8 @@ test_requires = [
     ]
 
 data_files =[
+        ('etc/stormberry', ['config.ini']),
+        ('lib/stormberry/plugins', ['README.md'])
         ]
 
 
@@ -32,7 +34,7 @@ setup(name='stormberry',
     package_dir={'':'src'},
     packages=[
         'stormberry',
-        'stormberry.plugins'
+        'stormberry.plugin_examples'
         ],
     data_files=data_files,
     package_data={

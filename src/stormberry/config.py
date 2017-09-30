@@ -6,14 +6,27 @@
     Configuration package.
 ********************************************************************************************************************'''
 import configparser
+import os
 
 
 class Config(configparser.ConfigParser):
     """Configuration class for Weather Station"""
 
-    def __init__(self, configfile="config.ini"):
+    def __init__(self, configfile=None):
         super(Config, self).__init__()
-        self.read(configfile)
+        self.config_locations = [
+                "/etc/stormberry/config.ini",
+                "/usr/local/etc/stormberry/config.ini",
+                "config.ini",
+                ]
+
+        if configfile is not None:
+            self.config_locations = [configfile]
+
+        for c in self.config_locations:
+            if os.path.exists(c):
+                self.read(c)
+                break
 
     def gettuple(self, section, attr):
         value = self.get(section, attr)
