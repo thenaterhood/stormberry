@@ -23,7 +23,6 @@ import os
 import sys
 import time
 from stormberry.storage_strategy.csv import CSVWriter
-from stormberry.storage_strategy.echo import Echoer
 
 from stormberry.config import Config
 from stormberry.weather_entities import DEFAULT_WEATHER_ENTITIES, CarouselContainer, WeatherEntityType
@@ -48,7 +47,7 @@ class WeatherStation(CarouselContainer):
         self.init_datastore()
 
     def init_datastore(self):
-        self.storage_strategy = [CSVWriter(self.config), Echoer(self.config)]
+        self.storage_strategy = [CSVWriter(self.config)]
 
     @property
     def carousel_items(self):
@@ -188,7 +187,7 @@ class WeatherStation(CarouselContainer):
     def _log_results(self, first_time=False):
         """Internal. Continuously logs sensors values."""
 
-        if not first_time:
+        if not first_time or self.config.getboolean("GENERAL", "WEATHER_TO_CONSOLE"):
             print(self.READINGS_PRINT_TEMPLATE % self.get_sensors_data().tuple)
 
         self._log_timer = self._start_timer(self.config.getint("GENERAL", "LOG_INTERVAL"), self._log_results)
