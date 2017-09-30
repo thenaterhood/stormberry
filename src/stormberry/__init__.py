@@ -20,15 +20,14 @@ from threading import Timer
 import datetime
 import logging 
 import os
-import signal
 import sys
 import time
-from storage_strategy.csv import CSVWriter
-from storage_strategy.echo import Echoer
+from stormberry.storage_strategy.csv import CSVWriter
+from stormberry.storage_strategy.echo import Echoer
 
-from config import Config
-from weather_entities import DEFAULT_WEATHER_ENTITIES, CarouselContainer, WeatherEntityType
-from weather_reading import WeatherReading
+from stormberry.config import Config
+from stormberry.weather_entities import DEFAULT_WEATHER_ENTITIES, CarouselContainer, WeatherEntityType
+from stormberry.weather_reading import WeatherReading
 
 class WeatherStation(CarouselContainer):
     """Weather Station controlling class, setups and manages station run time."""
@@ -144,7 +143,7 @@ class WeatherStation(CarouselContainer):
     def get_pressure(self):
         """Gets humidity sensor value and converts pressure from millibars to inHg before posting."""
         return self._sense_hat.get_pressure()
-    
+
     def get_sensors_data(self):
         """Returns sensors data tuple."""
 
@@ -161,7 +160,7 @@ class WeatherStation(CarouselContainer):
 
     def _change_weather_entity(self, event):
         """Internal. Switches to next/previous weather entity or next/previous visual style."""
-        
+
         # We need to handle release event state
         if event.action == ACTION_RELEASED:
             self._sense_hat.clear()
@@ -185,7 +184,7 @@ class WeatherStation(CarouselContainer):
         # Need to be sure we revert any changes to rotation
         self._sense_hat.rotation = 0
         self._sense_hat.show_message(message, self.config.getfloat("GENERAL", "SCROLL_TEXT_SPEED"), message_color, background_color)
-    
+
     def _log_results(self, first_time=False):
         """Internal. Continuously logs sensors values."""
 
@@ -224,7 +223,7 @@ class WeatherStation(CarouselContainer):
 
     def _start_timer(self, interval, callback):
         """Internal. Starts timer with given interval and callback function."""
-        
+
         timer = Timer(interval, callback)
         timer.daemon = True
         timer.start()
@@ -237,68 +236,19 @@ class WeatherStation(CarouselContainer):
         Executes a command at the OS to pull in the CPU temperature.
         Thanks to https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
         """
-        
+
         res = os.popen('vcgencmd measure_temp').readline()
         return float(res.replace('temp=', '').replace("'C\n", ''))
 
     def _get_smooth(self, value):
         """Moving average to smooth reading."""
-        
+
         # We use deque here as it is more efficient for in/out behaviour than regular list/tuple
         if not self._last_readings:
             self._last_readings = deque((value, ) * self.SMOOTH_READINGS_NUMBER, self.SMOOTH_READINGS_NUMBER)
         else:
             self._last_readings.appendleft(value)
-            
+
         # Average last temperature readings
         return sum(self._last_readings) / self.SMOOTH_READINGS_NUMBER
 
-
-# Check prerequisites and launch Weather Station
-if __name__ == '__main__':
-    config = Config()
-    # Setup logger, to log warning/errors during execution
-    logging.basicConfig(
-        filename=config.get("GENERAL", "LOGFILE"),
-        format='\r\n%(asctime)s %(levelname)s %(message)s', 
-        level=logging.WARNING
-    )
-
-    # Make sure we don't have an upload interval more than 3600 seconds
-    if config.getint("GENERAL", "UPLOAD_INTERVAL") > 3600:
-        print('The application\'s upload interval cannot be greater than 3600 seconds')
-        logging.warning('The application\'s upload interval cannot be greater than 3600 seconds')
-
-        sys.exit(1)
-
-    def _terminate_application(signal=None, frame=None):
-        """Nested. Internal. Tries to terminate weather station and make a clean up."""
-
-        # We need to check if station was initialized
-        if 'station' in globals():
-            station.stop_station()
-
-        logging.warning('Application terminated', exc_info=not signal)
-
-        print('\nExiting application')
-        
-    # Subscribe to signals events
-    signal.signal(signal.SIGTERM, _terminate_application)
-
-    try:
-        station = WeatherStation(config)
-
-        station.activate_sensors()
-        print('Successfully initialized sensors')
-
-        data = station.get_sensors_data()
-        print(station.READINGS_PRINT_TEMPLATE % data.tuple)
-
-        station.start_station()
-        print('Weather Station successfully launched')
-
-        signal.pause()
-    except:
-        _terminate_application()
-
-        sys.exit(0)

@@ -1,6 +1,6 @@
 import urllib2
 import logging
-import GenericStorageStrategy
+from stormberry.storage_strategy import GenericStorageStrategy
 from urllib import urlencode
 
 

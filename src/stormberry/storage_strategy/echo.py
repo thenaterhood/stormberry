@@ -1,5 +1,5 @@
 import logging
-from storage_strategy import GenericStorageStrategy
+from stormberry.storage_strategy import GenericStorageStrategy
 
 
 class Echoer(GenericStorageStrategy):

@@ -9,8 +9,8 @@
 
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-from config import Config
-from visual_styles import ArrowStyle, NumericStyle, SquareStyle, VisualStyle
+from stormberry.config import Config
+from stormberry.visual_styles import ArrowStyle, NumericStyle, SquareStyle, VisualStyle
 
 class CarouselContainer(object):
     """
