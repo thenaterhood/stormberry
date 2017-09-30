@@ -3,6 +3,7 @@ import logging
 import signal
 import sys
 from stormberry import WeatherStation
+from yapsy.PluginManager import PluginManager
 
 class SignalHandling(object):
     """
@@ -23,12 +24,17 @@ class SignalHandling(object):
         pass
 
 def main():
-
     config = Config()
+    plugin_manager = PluginManager()
+    plugin_manager.setPluginPlaces(
+            [config.get("GENERAL", "PLUGIN_DIRECTORY")]
+            )
+    plugin_manager.collectPlugins()
+
     # Setup logger, to log warning/errors during execution
     logging.basicConfig(
             filename=config.get("GENERAL", "LOGFILE"),
-            format='\r\n%(asctime)s %(levelname)s %(message)s', 
+            format='\r\n%(asctime)s %(levelname)s %(message)s',
             level=logging.WARNING
             )
 
@@ -40,7 +46,7 @@ def main():
         sys.exit(1)
 
     try:
-        station = WeatherStation(config)
+        station = WeatherStation(plugin_manager, config)
 
         station.activate_sensors()
         print('Successfully initialized sensors')
@@ -50,8 +56,10 @@ def main():
         with SignalHandling(station) as sh:
             station.start_station()
             print('Weather Station successfully launched')
+            signal.pause()
 
-    except:
+    except Exception as e:
+        print(e)
         station.stop_station()
 
         sys.exit(0)

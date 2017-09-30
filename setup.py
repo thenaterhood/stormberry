@@ -32,7 +32,7 @@ setup(name='stormberry',
     package_dir={'':'src'},
     packages=[
         'stormberry',
-        'stormberry.storage_strategy'
+        'stormberry.plugins'
         ],
     data_files=data_files,
     package_data={

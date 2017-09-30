@@ -22,7 +22,6 @@ import logging
 import os
 import sys
 import time
-from stormberry.storage_strategy.csv import CSVWriter
 
 from stormberry.config import Config
 from stormberry.weather_entities import DEFAULT_WEATHER_ENTITIES, CarouselContainer, WeatherEntityType
@@ -35,7 +34,7 @@ class WeatherStation(CarouselContainer):
     SMOOTH_READINGS_NUMBER = 3
     READINGS_PRINT_TEMPLATE = 'Temp: %sC (%sF), Humidity: %s%%, Pressure: %s inHg'
 
-    def __init__(self, config=None):
+    def __init__(self, plugin_manager=None, config=None):
         super(WeatherStation, self).__init__()
 
         self._sense_hat = None
@@ -43,11 +42,8 @@ class WeatherStation(CarouselContainer):
         self._upload_timer = None
         self._update_timer = None
         self._last_readings = None
+        self.plugin_manager = plugin_manager
         self.config = config if config is not None else Config()
-        self.init_datastore()
-
-    def init_datastore(self):
-        self.storage_strategy = [CSVWriter(self.config)]
 
     @property
     def carousel_items(self):
@@ -86,7 +82,7 @@ class WeatherStation(CarouselContainer):
         if self.config.getboolean("GENERAL", "UPDATE_DISPLAY") and self.config.getint("GENERAL", "UPDATE_INTERVAL"):
             self._update_display()
 
-    def stop_station(self):
+    def stop_station(self, *args):
         """Tries to stop active threads and clean up screen."""
         if self._sense_hat:
             self._sense_hat.clear()
@@ -214,9 +210,10 @@ class WeatherStation(CarouselContainer):
         """Internal. Continuously uploads new sensors values to Weather Underground."""
 
         data = self.get_sensors_data()
-        if self.storage_strategy is not None:
-            for s in self.storage_strategy:
-                s.save_data(data, first_time)
+        if self.plugin_manager is not None:
+            for p in self.plugin_manager.getAllPlugins():
+                p.plugin_object.set_config(self.config)
+                p.plugin_object.save_data(data, first_time)
 
         self._upload_timer = self._start_timer(self.config.getint("GENERAL", "UPLOAD_INTERVAL"), self._upload_results)
 

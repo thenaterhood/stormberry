@@ -1,0 +1,9 @@
+[Core]
+Name = CSV Writer
+Module = csv
+
+[Documentation]
+Author = Nate Levesque
+Version = 0.1
+Website = http://github.com/thenaterhood/stormberry
+Description = Plugin that stores weather readings to CSV

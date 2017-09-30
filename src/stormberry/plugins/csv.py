@@ -1,10 +1,12 @@
-import logging
-from stormberry.storage_strategy import GenericStorageStrategy
 import csv
 import os
+from stormberry.GenericPlugin import GenericPlugin
+from yapsy.IPlugin import IPlugin
 
+class CSVWriter(GenericPlugin, IPlugin):
 
-class CSVWriter(GenericStorageStrategy):
+    def set_config(self, config):
+        self.config = config
 
     def save_data(self, data, first_time=False):
 
