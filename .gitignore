@@ -52,3 +52,6 @@ Temporary Items
 # Python
 *.pyc
 *.log
+dist
+*.egg-info
+build
