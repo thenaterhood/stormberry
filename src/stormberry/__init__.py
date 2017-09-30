@@ -34,7 +34,7 @@ class WeatherStation(CarouselContainer):
     SMOOTH_READINGS_NUMBER = 3
     READINGS_PRINT_TEMPLATE = 'Temp: %sC (%sF), Humidity: %s%%, Pressure: %s inHg'
 
-    def __init__(self, plugin_manager=None, config=None):
+    def __init__(self, plugin_manager=None, config=None, log=None):
         super(WeatherStation, self).__init__()
 
         self._sense_hat = None
@@ -42,6 +42,7 @@ class WeatherStation(CarouselContainer):
         self._upload_timer = None
         self._update_timer = None
         self._last_readings = None
+        self.log = log if log is not None else logging
         self.plugin_manager = plugin_manager
         self.config = config if config is not None else Config()
 
@@ -212,8 +213,11 @@ class WeatherStation(CarouselContainer):
         data = self.get_sensors_data()
         if self.plugin_manager is not None:
             for p in self.plugin_manager.getAllPlugins():
-                p.plugin_object.set_config(self.config)
-                p.plugin_object.save_data(data, first_time)
+                try:
+                    p.plugin_object.set_config(self.config)
+                    p.plugin_object.save_data(data, first_time)
+                except Exception as e:
+                    self.log.error("Plugin %s raised an error: %s" % (p.name, str(e)))
 
         self._upload_timer = self._start_timer(self.config.getint("GENERAL", "UPLOAD_INTERVAL"), self._upload_results)
 

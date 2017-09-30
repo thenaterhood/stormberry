@@ -20,7 +20,7 @@ class CSVWriter(GenericPlugin, IPlugin):
             csv_file_exists = False
 
         with open(filename, 'a') as csv_file:
-            fieldnames = ["timestamp", "tempc", "tempf", "humidity", "pressure_inHg", "dewpointc"]
+            fieldnames = ["timestr", "tempc", "tempf", "humidity", "inchesHg", "dewpointc"]
             writer = csv.DictWriter(csv_file, fieldnames)
 
             if not csv_file_exists:
@@ -29,9 +29,9 @@ class CSVWriter(GenericPlugin, IPlugin):
             writer.writerow({
                 'tempc': data.tempc,
                 'tempf': data.tempf,
-                'timestamp': data.timestr,
+                'timestr': data.timestr,
                 'humidity': data.humidity,
-                'pressure_inHg': data.pressure_inHg,
+                'inchesHg': data.pressure_inHg,
                 'dewpointc': data.dewpointc
                 })
 

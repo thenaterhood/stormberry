@@ -55,3 +55,14 @@ class WeatherReading():
                 self.pressure_inHg
                 )
 
+    @property
+    def dict(self):
+        return {
+                'timestr': self.timestr,
+                'tempc': self.tempc,
+                'tempf': self.tempf,
+                'humidity': self.humidity,
+                'inchesHg' : self.pressure_inHg,
+                'dewpointc': self.dewpointc
+                }
+

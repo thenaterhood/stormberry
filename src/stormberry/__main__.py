@@ -1,5 +1,5 @@
 from stormberry import Config
-import logging
+import logging, logging.handlers
 import signal
 import sys
 from stormberry import WeatherStation
@@ -26,40 +26,57 @@ class SignalHandling(object):
 def main():
     config = Config()
     plugin_manager = PluginManager()
+    logger = logging.getLogger('stormberry')
+    logger.setLevel(logging.DEBUG)
+
+    try:
+        filehandler = logging.handlers.TimedRotatingFileHandler(
+                filename=config.get("GENERAL", "LOGFILE"),
+                when="W0"
+                )
+    except:
+        filehandler = logging.handlers.TimeRotatingFileHandler(
+                filename="/tmp/stormberry.log",
+                when="W0"
+                )
+
+    formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(name)s;%(message)s",
+            "%Y-%m-%d %H:%M:%S")
+    filehandler.setFormatter(formatter)
+    logger.addHandler(filehandler)
+
+    termhandler = logging.StreamHandler(sys.stdout)
+    termhandler.setLevel(logging.INFO)
+    logger.addHandler(termhandler)
+
     plugin_manager.setPluginPlaces(
             [config.get("GENERAL", "PLUGIN_DIRECTORY")]
             )
     plugin_manager.collectPlugins()
-
-    # Setup logger, to log warning/errors during execution
-    logging.basicConfig(
-            filename=config.get("GENERAL", "LOGFILE"),
-            format='\r\n%(asctime)s %(levelname)s %(message)s',
-            level=logging.WARNING
-            )
+    plugins = plugin_manager.getAllPlugins()
+    logger.info("Loaded %d plugins" % len(plugins))
 
     # Make sure we don't have an upload interval more than 3600 seconds
     if config.getint("GENERAL", "UPLOAD_INTERVAL") > 3600:
-        print('The application\'s upload interval cannot be greater than 3600 seconds')
-        logging.warning('The application\'s upload interval cannot be greater than 3600 seconds')
+        logger.error('The application\'s upload interval cannot be greater than 3600 seconds')
 
         sys.exit(1)
 
     try:
-        station = WeatherStation(plugin_manager, config)
+        station = WeatherStation(plugin_manager, config, logger)
 
         station.activate_sensors()
-        print('Successfully initialized sensors')
+        logger.info('Successfully initialized sensors')
 
         data = station.get_sensors_data()
-        print(station.READINGS_PRINT_TEMPLATE % data.tuple)
+        logger.info("Initial Reading: " + station.READINGS_PRINT_TEMPLATE % data.tuple)
         with SignalHandling(station) as sh:
             station.start_station()
-            print('Weather Station successfully launched')
+            logger.info('Weather Station successfully launched')
             signal.pause()
 
     except Exception as e:
-        print(e)
+        logger.critical(e)
         station.stop_station()
 
         sys.exit(0)
