@@ -1,0 +1,9 @@
+[Core]
+Name = Google Sheets Uploader
+Module = gsheets
+
+[Documentation]
+Author = Nate Levesque
+Version = 0.1
+Website = http://github.com/thenaterhood/stormberry
+Description = Uploads weather data to a google sheet

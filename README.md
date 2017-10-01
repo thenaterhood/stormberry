@@ -28,7 +28,7 @@ Plugins can be enabled by placing them (the .py and the .yapsy-plugin files) in
 /usr/local/lib/stormberry/plugins. There are no plugins enabled by default - you can
 copy them from the `plugins` directory (or from
 /usr/local/lib/python3.5/dist-packages/stormberry/plugin_examples). Plugins
-shipped with stormberry include a Wunderground uploader, CSV file creator, and
+shipped with stormberry include a Wunderground uploader, CSV file creator, Google Sheets uploader, and
 a SQLite database writer.
 
 If that directory does not exist, feel free to create it or update the config
