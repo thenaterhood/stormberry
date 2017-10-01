@@ -1,0 +1,13 @@
+[Unit]
+Description=stormberry weather station service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/stormberry
+Restart=always
+ExecStop=/bin/kill -s QUIT $MAINPID
+TimeoutStopSec=6
+
+[Install]
+Alias=stormberry.service
+WantedBy=multi-user.target
