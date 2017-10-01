@@ -14,7 +14,7 @@
 ********************************************************************************************************************'''
 from __future__ import print_function
 from collections import deque
-from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT
+from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, ACTION_PRESSED, DIRECTION_MIDDLE
 from threading import Timer
 
 import datetime
@@ -70,6 +70,7 @@ class WeatherStation(CarouselContainer):
         self._sense_hat.stick.direction_down = self._change_weather_entity
         self._sense_hat.stick.direction_left = self._change_weather_entity
         self._sense_hat.stick.direction_right = self._change_weather_entity
+        self._sense_hat.stick.direction_middle = self._toggle_display
     
     def start_station(self):
         """Launches multiple threads to handle configured behavior."""
@@ -154,6 +155,16 @@ class WeatherStation(CarouselContainer):
 
         return wr
 
+    def _toggle_display(self, event):
+        if event.action == ACTION_RELEASED:
+            self._sense_hat.clear()
+            if event.direction == DIRECTION_MIDDLE:
+                old_update_display = self.config.getboolean("GENERAL", "UPDATE_DISPLAY")
+                new_update_display = not old_update_display
+                self.config.set("GENERAL", "UPDATE_DISPLAY", str(new_update_display))
+
+        self._update_display(loop=False)
+
     def _change_weather_entity(self, event):
         """Internal. Switches to next/previous weather entity or next/previous visual style."""
 
@@ -172,11 +183,12 @@ class WeatherStation(CarouselContainer):
             else:
                 self.current_item.next_item
 
-            self._update_display(loop=False)
+        self._update_display(loop=False)
 
-    def _show_message(self, message, message_color, background_color=(0, 0, 0)):
+    def _show_message(self, message, message_color=(255,255,255), background_color=(0, 0, 0)):
         """Internal. Shows message by scrolling it over HAT screen."""
-
+        if not self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
+            return
         # Need to be sure we revert any changes to rotation
         self._sense_hat.rotation = 0
         self._sense_hat.show_message(message, self.config.getfloat("GENERAL", "SCROLL_TEXT_SPEED"), message_color, background_color)
@@ -191,6 +203,9 @@ class WeatherStation(CarouselContainer):
 
     def _update_display(self, loop=True):
         """Internal. Continuously updates screen with new sensors values."""
+
+        if not self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
+            return
 
         sensors_data = self.get_sensors_data()
 
