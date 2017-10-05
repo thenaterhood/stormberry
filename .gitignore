@@ -48,3 +48,11 @@ Temporary Items
 
 # Visual Studion
 *.pyproj
+
+# Python
+*.pyc
+*.log
+dist
+*.egg-info
+build
+install.txt

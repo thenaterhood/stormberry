@@ -1,0 +1,16 @@
+[Core]
+Name = Wunderground Uploader
+Module = wunderground
+
+[Documentation]
+Author = Uladzislau Bayouski
+Version = 0.1
+Website = http://github.com/UBayouski/WeatherStation
+Description = Uploads weather readings to Wunderground.
+;Requires configuration in the stormberry main configuration. Sample config is
+;below - append it to the main stormberry config if the section isn't already
+;there.
+;[WUNDERGROUND]
+;STATION_ID='YOUR_STATION_ID'
+;STATION_KEY='YOUR_STATION_KEY'
+;WU_URL='http://weatherstation.wunderground.com/weatherstation/updateweatherstation.php'
