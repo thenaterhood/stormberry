@@ -6,10 +6,10 @@
 
     A Raspberry Pi based weather station that measures temperature, humidity and pressure using
     the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station.
-    Calculates dew point. Completely configurable and working asyncroniously in multi threads. 
-    Uses stick for choosing different weather entities and visual styles. 
+    Calculates dew point. Completely configurable and working asyncroniously in multi threads.
+    Uses stick for choosing different weather entities and visual styles.
     Uses logger to log runtime issues/errors.
-    
+
     Inspired by http://makezine.com/projects/raspberry-pi-weather-station-mount/ project
 ********************************************************************************************************************'''
 from __future__ import print_function
@@ -18,7 +18,7 @@ from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, D
 from threading import Timer
 
 import datetime
-import logging 
+import logging
 import os
 import sys
 import time
@@ -71,7 +71,7 @@ class WeatherStation(CarouselContainer):
         self._sense_hat.stick.direction_left = self._change_weather_entity
         self._sense_hat.stick.direction_right = self._change_weather_entity
         self._sense_hat.stick.direction_middle = self._toggle_display
-    
+
     def start_station(self):
         """Launches multiple threads to handle configured behavior."""
         if self.config.getboolean("GENERAL", "LOG_TO_CONSOLE") \
@@ -109,27 +109,27 @@ class WeatherStation(CarouselContainer):
     def get_temperature(self):
         """
         Gets temperature and adjusts it with environmental impacts (like cpu temperature).
-                
+
         There are some issues, getting an accurate temperature reading from the
         Sense HAT is improbable, see here:
         https://www.raspberrypi.org/forums/viewtopic.php?f=104&t=111457
         We need to take CPU temp into account. The Pi foundation recommendeds using the following:
-        http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html        
+        http://yaab-arduino.blogspot.co.uk/2016/08/accurate-temperature-reading-sensehat.html
         """
-        
+
         # Get temp readings from both sensors
         humidity_temp = self._sense_hat.get_temperature_from_humidity()
         pressure_temp = self._sense_hat.get_temperature_from_pressure()
-        
+
         # avg_temp becomes the average of the temperatures from both sensors
         # We need to check for pressure_temp value is not 0, to not ruin avg_temp calculation
         avg_temp = (humidity_temp + pressure_temp) / 2 if pressure_temp else humidity_temp
-        
+
         # Get the CPU temperature
         cpu_temp = self._get_cpu_temp()
         # Calculate temperature compensating for CPU heating
         adj_temp = avg_temp - ((cpu_temp - avg_temp) / 1.5)
-        
+
         # Average out value across the last three readings
         return self._get_smooth(adj_temp)
 
