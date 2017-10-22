@@ -131,7 +131,7 @@ class WeatherStation(CarouselContainer):
             # Calculate temperature compensating for CPU heating
             adj_temp = avg_temp - ((cpu_temp - avg_temp) / 1.5)
         else:
-            adj_temp = avg_tmp
+            adj_temp = avg_temp
 
         # Average out value across the last three readings
         return self._get_smooth(adj_temp)
