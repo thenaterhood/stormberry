@@ -135,11 +135,11 @@ class WeatherStation(CarouselContainer):
 
     def get_humidity(self):
         """Gets humidity sensor value."""
-        return self._sense_hat.get_humidity() * self.config.getint("GENERAL", "HUMIDITY_ADJUSTMENT")
+        return self._sense_hat.get_humidity() * self.config.getfloat("GENERAL", "HUMIDITY_ADJUSTMENT")
 
     def get_pressure(self):
         """Gets humidity sensor value and converts pressure from millibars to inHg before posting."""
-        return self._sense_hat.get_pressure() * self.config.getint("GENERAL", "PRESSURE_ADJUSTMENT")
+        return self._sense_hat.get_pressure() * self.config.getfloat("GENERAL", "PRESSURE_ADJUSTMENT")
 
     def get_sensors_data(self):
         """Returns sensors data tuple."""
