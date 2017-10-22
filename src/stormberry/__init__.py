@@ -125,10 +125,13 @@ class WeatherStation(CarouselContainer):
         # We need to check for pressure_temp value is not 0, to not ruin avg_temp calculation
         avg_temp = (humidity_temp + pressure_temp) / 2 if pressure_temp else humidity_temp
 
-        # Get the CPU temperature
-        cpu_temp = self._get_cpu_temp()
-        # Calculate temperature compensating for CPU heating
-        adj_temp = avg_temp - ((cpu_temp - avg_temp) / 1.5)
+        if (self.config.getboolean("GENERAL", "ADJUST_TEMPERATURE_FOR_CPU")):
+            # Get the CPU temperature
+            cpu_temp = self._get_cpu_temp()
+            # Calculate temperature compensating for CPU heating
+            adj_temp = avg_temp - ((cpu_temp - avg_temp) / 1.5)
+        else:
+            adj_temp = avg_tmp
 
         # Average out value across the last three readings
         return self._get_smooth(adj_temp)
