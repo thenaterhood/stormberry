@@ -35,7 +35,7 @@ def main():
                 when="W0"
                 )
     except:
-        filehandler = logging.handlers.TimeRotatingFileHandler(
+        filehandler = logging.handlers.TimedRotatingFileHandler(
                 filename="/tmp/stormberry.log",
                 when="W0"
                 )
