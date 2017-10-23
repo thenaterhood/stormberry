@@ -133,6 +133,8 @@ class WeatherStation(CarouselContainer):
         else:
             adj_temp = avg_temp
 
+        adj_temp = adj_temp * self.config.getfloat("GENERAL", "TEMPERATURE_ADJUSTMENT")
+
         # Average out value across the last three readings
         return self._get_smooth(adj_temp)
 
@@ -226,16 +228,19 @@ class WeatherStation(CarouselContainer):
             self._update_timer = self._start_timer(self.config.getint("GENERAL", "UPDATE_INTERVAL"), self._update_display)
 
     def _upload_results(self, first_time=False):
-        """Internal. Continuously uploads new sensors values to Weather Underground."""
 
-        data = self.get_sensors_data()
-        if self.plugin_manager is not None:
-            for p in self.plugin_manager.getAllPlugins():
-                try:
-                    p.plugin_object.set_config(self.config)
-                    p.plugin_object.save_data(data, first_time)
-                except Exception as e:
-                    self.log.error("Plugin %s raised an error: %s" % (p.name, str(e)))
+        discard_first = self.config.getboolean("GENERAL", "DISCARD_FIRST_READING")
+        if first_time and discard_first:
+            self.log.info("Discarding first reading")
+        else:
+            data = self.get_sensors_data()
+            if self.plugin_manager is not None:
+                for p in self.plugin_manager.getAllPlugins():
+                    try:
+                        p.plugin_object.set_config(self.config)
+                        p.plugin_object.save_data(data, first_time)
+                    except Exception as e:
+                        self.log.error("Plugin %s raised an error: %s" % (p.name, str(e)))
 
         self._upload_timer = self._start_timer(self.config.getint("GENERAL", "UPLOAD_INTERVAL"), self._upload_results)
 
