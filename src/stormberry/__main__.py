@@ -68,8 +68,6 @@ def main():
         station.activate_sensors()
         logger.info('Successfully initialized sensors')
 
-        data = station.get_sensors_data()
-        logger.info("Initial Reading: " + station.READINGS_PRINT_TEMPLATE % data.tuple)
         with SignalHandling(station) as sh:
             station.start_station()
             logger.info('Weather Station successfully launched')

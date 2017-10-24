@@ -32,16 +32,15 @@ class WeatherStation(CarouselContainer):
 
     # Constants
     SMOOTH_READINGS_NUMBER = 3
-    READINGS_PRINT_TEMPLATE = 'Temp: %sC (%sF), Humidity: %s%%, Pressure: %s inHg'
 
     def __init__(self, plugin_manager=None, config=None, log=None):
         super(WeatherStation, self).__init__()
 
         self._sense_hat = None
-        self._log_timer = None
         self._upload_timer = None
         self._update_timer = None
         self._last_readings = None
+        self._latest_reading = None
         self.log = log if log is not None else logging
         self.plugin_manager = plugin_manager
         self.config = config if config is not None else Config()
@@ -53,6 +52,10 @@ class WeatherStation(CarouselContainer):
     @property
     def current_style(self):
         return self.current_item.current_style
+
+    @property
+    def latest_reading(self):
+        return self._latest_reading
 
     def activate_sensors(self):
         """Activates sensors by requesting first values and assigning handlers."""
@@ -74,12 +77,8 @@ class WeatherStation(CarouselContainer):
 
     def start_station(self):
         """Launches multiple threads to handle configured behavior."""
-        if self.config.getboolean("GENERAL", "LOG_TO_CONSOLE") \
-            and self.config.getboolean("GENERAL", "LOG_INTERVAL"):
-            self._log_results(first_time=True)
-
         if self.config.getboolean("GENERAL", "WEATHER_UPLOAD") and self.config.getint("GENERAL", "UPLOAD_INTERVAL"):
-            self._upload_results(first_time=True)
+            self._report_new_reading()
 
         if self.config.getboolean("GENERAL", "UPDATE_DISPLAY") and self.config.getint("GENERAL", "UPDATE_INTERVAL"):
             self._update_display()
@@ -88,9 +87,6 @@ class WeatherStation(CarouselContainer):
         """Tries to stop active threads and clean up screen."""
         if self._sense_hat:
             self._sense_hat.clear()
-
-        if self._log_timer:
-            self._log_timer.cancel()
 
         if self._upload_timer:
             self._upload_timer.cancel()
@@ -134,9 +130,7 @@ class WeatherStation(CarouselContainer):
             adj_temp = avg_temp
 
         adj_temp = adj_temp * self.config.getfloat("GENERAL", "TEMPERATURE_ADJUSTMENT")
-
-        # Average out value across the last three readings
-        return self._get_smooth(adj_temp)
+        return adj_temp
 
     def get_humidity(self):
         """Gets humidity sensor value."""
@@ -146,10 +140,25 @@ class WeatherStation(CarouselContainer):
         """Gets humidity sensor value and converts pressure from millibars to inHg before posting."""
         return self._sense_hat.get_pressure() * self.config.getfloat("GENERAL", "PRESSURE_ADJUSTMENT")
 
-    def get_sensors_data(self):
-        """Returns sensors data tuple."""
+    def _take_new_reading(self, smooth=True):
+        """
+        Retrieves data from the sensors and returns a
+        WeatherReading instance that contains it. This also
+        saves the temperature for data smoothing unless
+        told otherwise.
+
+        Params:
+            smooth (bool): whether to smooth sensor values.
+                defaults to true. If false, the value will
+                not be smoothed and will not be kept for
+                future smoothing.
+        """
 
         temp_in_celsius = self.get_temperature()
+
+        # Average out value across the last three readings
+        if (smooth):
+            temp_in_celsius = self._get_smooth(temp_in_celsius)
 
         wr = WeatherReading(
                 temp_in_celsius,
@@ -198,42 +207,44 @@ class WeatherStation(CarouselContainer):
         self._sense_hat.rotation = 0
         self._sense_hat.show_message(message, self.config.getfloat("GENERAL", "SCROLL_TEXT_SPEED"), message_color, background_color)
 
-    def _log_results(self, first_time=False):
-        """Internal. Continuously logs sensors values."""
-
-        if not first_time or self.config.getboolean("GENERAL", "WEATHER_TO_CONSOLE"):
-            print(self.READINGS_PRINT_TEMPLATE % self.get_sensors_data().tuple)
-
-        self._log_timer = self._start_timer(self.config.getint("GENERAL", "LOG_INTERVAL"), self._log_results)
-
     def _update_display(self, loop=True):
         """Internal. Continuously updates screen with new sensors values."""
 
         if not self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
             return
 
-        sensors_data = self.get_sensors_data()
+        sensors_data = self._latest_reading
+        if sensors_data is not None:
+            if self.current_item.entity_type is WeatherEntityType.TEMPERATURE:
+                pixels = self.current_item.show_pixels(sensors_data.tempc)
+            elif self.current_item.entity_type is WeatherEntityType.HUMIDITY:
+                pixels = self.current_item.show_pixels(sensors_data.humidity)
+            else:
+                pixels = self.current_item.show_pixels(sensors_data.pressure_inHg)
 
-        if self.current_item.entity_type is WeatherEntityType.TEMPERATURE:
-            pixels = self.current_item.show_pixels(sensors_data.tempc)
-        elif self.current_item.entity_type is WeatherEntityType.HUMIDITY:
-            pixels = self.current_item.show_pixels(sensors_data.humidity)
-        else:
-            pixels = self.current_item.show_pixels(sensors_data.pressure_inHg)
-
-        self._sense_hat.set_rotation(self.current_style.rotation)
-        self._sense_hat.set_pixels(pixels)
+            self._sense_hat.set_rotation(self.current_style.rotation)
+            self._sense_hat.set_pixels(pixels)
 
         if loop:
             self._update_timer = self._start_timer(self.config.getint("GENERAL", "UPDATE_INTERVAL"), self._update_display)
 
-    def _upload_results(self, first_time=False):
+    def _report_new_reading(self):
+        """
+        Takes a new weather reading, and informs plugins of the new
+        reading. This is intended to be used internally only, as it
+        will call plugins. It is automatically called periodically
+        based on the configuration
+        """
+        first_time = self._latest_reading is None
 
         discard_first = self.config.getboolean("GENERAL", "DISCARD_FIRST_READING")
+        data = None
+
         if first_time and discard_first:
-            self.log.info("Discarding first reading")
+            data = self._take_new_reading(smooth=False)
+            self.log.info("Discarding first reading: " + str(data))
         else:
-            data = self.get_sensors_data()
+            data = self._take_new_reading()
             if self.plugin_manager is not None:
                 for p in self.plugin_manager.getAllPlugins():
                     try:
@@ -242,7 +253,8 @@ class WeatherStation(CarouselContainer):
                     except Exception as e:
                         self.log.error("Plugin %s raised an error: %s" % (p.name, str(e)))
 
-        self._upload_timer = self._start_timer(self.config.getint("GENERAL", "UPLOAD_INTERVAL"), self._upload_results)
+        self._latest_reading = data
+        self._upload_timer = self._start_timer(self.config.getint("GENERAL", "UPLOAD_INTERVAL"), self._report_new_reading)
 
     def _start_timer(self, interval, callback):
         """Internal. Starts timer with given interval and callback function."""

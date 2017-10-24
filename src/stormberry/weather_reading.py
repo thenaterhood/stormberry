@@ -1,5 +1,7 @@
 class WeatherReading():
 
+    READINGS_PRINT_TEMPLATE = 'Temp: %sC (%sF), Humidity: %s%%, Pressure: %s inHg'
+
     def __init__(self, tempc, humidity, pressure, date):
         self.__tempc = tempc
         self.__humidity = humidity
@@ -65,4 +67,7 @@ class WeatherReading():
                 'inchesHg' : self.pressure_inHg,
                 'dewpointc': self.dewpointc
                 }
+
+    def __str__(self):
+        return (self.READINGS_PRINT_TEMPLATE % self.tuple)
 
