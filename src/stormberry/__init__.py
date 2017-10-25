@@ -13,7 +13,6 @@
     Inspired by http://makezine.com/projects/raspberry-pi-weather-station-mount/ project
 ********************************************************************************************************************'''
 from __future__ import print_function
-from collections import deque
 from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, ACTION_PRESSED, DIRECTION_MIDDLE
 from threading import Timer
 
@@ -26,6 +25,7 @@ import time
 from stormberry.config import Config
 from stormberry.weather_entities import DEFAULT_WEATHER_ENTITIES, CarouselContainer, WeatherEntityType
 from stormberry.weather_reading import WeatherReading
+from stormberry.smoother import Smoother
 
 class WeatherStation(CarouselContainer):
     """Weather Station controlling class, setups and manages station run time."""
@@ -44,6 +44,8 @@ class WeatherStation(CarouselContainer):
         self.log = log if log is not None else logging
         self.plugin_manager = plugin_manager
         self.config = config if config is not None else Config()
+        self._temp_smoother = Smoother(self.SMOOTH_READINGS_NUMBER)
+        self._humid_smoother = Smoother(self.SMOOTH_READINGS_NUMBER)
 
     @property
     def carousel_items(self):
@@ -155,14 +157,16 @@ class WeatherStation(CarouselContainer):
         """
 
         temp_in_celsius = self.get_temperature()
+        humidity = self.get_humidity()
 
         # Average out value across the last three readings
         if (smooth):
-            temp_in_celsius = self._get_smooth(temp_in_celsius)
+            temp_in_celsius = self._temp_smoother.smooth(temp_in_celsius)
+            humidity = self._humid_smoother.smooth(humidity)
 
         wr = WeatherReading(
                 temp_in_celsius,
-                self.get_humidity(),
+                humidity,
                 self._sense_hat.get_pressure(),
                 datetime.datetime.now()
                 )
@@ -274,16 +278,4 @@ class WeatherStation(CarouselContainer):
 
         res = os.popen('vcgencmd measure_temp').readline()
         return float(res.replace('temp=', '').replace("'C\n", ''))
-
-    def _get_smooth(self, value):
-        """Moving average to smooth reading."""
-
-        # We use deque here as it is more efficient for in/out behaviour than regular list/tuple
-        if not self._last_readings:
-            self._last_readings = deque((value, ) * self.SMOOTH_READINGS_NUMBER, self.SMOOTH_READINGS_NUMBER)
-        else:
-            self._last_readings.appendleft(value)
-
-        # Average last temperature readings
-        return sum(self._last_readings) / self.SMOOTH_READINGS_NUMBER
 
