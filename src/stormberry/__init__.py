@@ -95,14 +95,6 @@ class WeatherStation(CarouselContainer):
         if self._update_timer:
             self._update_timer.cancel()
 
-    @staticmethod
-    def calculate_dew_point(temp, hum):
-        """
-        Calculates dewpoint in celsius, uses simplified formula less accurate but obvious.
-        https://en.wikipedia.org/wiki/Dew_point#Calculating_the_dew_point
-        """
-        return temp - (100 - hum) / 5
-
     def get_temperature(self):
         """
         Gets temperature and adjusts it with environmental impacts (like cpu temperature).
