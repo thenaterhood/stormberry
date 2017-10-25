@@ -39,7 +39,6 @@ class WeatherStation(CarouselContainer):
         self._sense_hat = None
         self._upload_timer = None
         self._update_timer = None
-        self._last_readings = None
         self._latest_reading = None
         self.log = log if log is not None else logging
         self.plugin_manager = plugin_manager
