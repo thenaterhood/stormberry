@@ -2,10 +2,10 @@
     Raspberry Pi + Raspbian Weather Station
     By Uladzislau Bayouski
     https://www.linkedin.com/in/uladzislau-bayouski-a7474111b/
-    
+
     Visual styles package.
 ********************************************************************************************************************'''
-    
+
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 class VisualStyle(object):
@@ -14,7 +14,7 @@ class VisualStyle(object):
 
     def __init__(self, positive_color, negative_color):
         # No color for led
-        self._e = (0, 0, 0) 
+        self._e = (0, 0, 0)
 
         # We use positive and negative color tuples to figure out the color applied to visual style
         # For example:
@@ -36,7 +36,7 @@ class VisualStyle(object):
 class ArrowStyle(VisualStyle):
     """
     Arrow visual style implementation.
-    
+
     Depends on previous and new values:
         a) if new/current value is bigger than previous shows arrow up
         b) if new/current values is less than previous shows arrow down
@@ -75,7 +75,7 @@ class ArrowStyle(VisualStyle):
             self._e, self._e, self._e, self._e, self._e, self._e, self._e, self._e, #6
             self._e, self._e, self._e, self._e, self._e, self._e, self._e, self._e, #7
         )
-    
+
     def apply_style(self, value):
         # Need delta of current and previous values to figure what symbol to show
         new_value = value
@@ -91,17 +91,17 @@ class ArrowStyle(VisualStyle):
 class NumericStyle(VisualStyle):
     """
     Numeric visual style implementation.
-    
+
     Shows one/two digits values.
     In case value has more than 2 digits shows infinity symbol.
     """
-    
+
     def __init__(self, positive_color, negative_color):
         super(NumericStyle, self).__init__(positive_color, negative_color)
 
         # Empty line, used to build final number
         self._empty_line = (self._e, self._e, self._e, self._e, self._e, self._e, self._e, self._e)
-        
+
         # Numbers dictionary: key is number as string, value is its pixel map
         self._numbers = {
             '0': (
@@ -199,15 +199,15 @@ class NumericStyle(VisualStyle):
             result = tuple(self._n if pixel is self._p else self._e for pixel in result)
 
         return result
-            
+
 
 class SquareStyle(VisualStyle):
     """
     Square visual style implementation.
-    
+
     Visualize value as a square of different colored pixels.
     """
-    
+
     def __init__(self, positive_color, negative_color):
         super(SquareStyle, self).__init__(positive_color, negative_color)
 

@@ -35,7 +35,7 @@ def main():
                 when="W0"
                 )
     except:
-        filehandler = logging.handlers.TimeRotatingFileHandler(
+        filehandler = logging.handlers.TimedRotatingFileHandler(
                 filename="/tmp/stormberry.log",
                 when="W0"
                 )
@@ -68,8 +68,6 @@ def main():
         station.activate_sensors()
         logger.info('Successfully initialized sensors')
 
-        data = station.get_sensors_data()
-        logger.info("Initial Reading: " + station.READINGS_PRINT_TEMPLATE % data.tuple)
         with SignalHandling(station) as sh:
             station.start_station()
             logger.info('Weather Station successfully launched')

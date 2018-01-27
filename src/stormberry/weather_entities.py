@@ -3,7 +3,7 @@
     Raspberry Pi + Raspbian Weather Station
     By Uladzislau Bayouski
     https://www.linkedin.com/in/uladzislau-bayouski-a7474111b/
-    
+
     Weather entities (temperature, humidity, pressure) package.
 ********************************************************************************************************************'''
 
@@ -15,7 +15,7 @@ from stormberry.visual_styles import ArrowStyle, NumericStyle, SquareStyle, Visu
 class CarouselContainer(object):
     """
     Base class for carousel like classes.
-    
+
     These classes contain list of items, and iterate through them functionality.
     """
     __metaclass__ = ABCMeta
@@ -28,33 +28,33 @@ class CarouselContainer(object):
     def carousel_items(self):
         """Carousel items to iterate through."""
         pass
-   
+
     @property
     def next_item(self):
         """
         Gets next item, and sets its index as current_index.
-        
+
         If item is the last one returns the first item.
         """
         if self.current_index < len(self.carousel_items) - 1:
             self.current_index += 1
         else:
             self.current_index = 0
-            
+
         return self.current_item
 
     @property
     def previous_item(self):
         """
         Gets previous item, and sets its index as current_index.
-        
+
         If item is the first one returns the last item.
         """
         if self.current_index > 0:
             self.current_index -= 1
         else:
             self.current_index = len(self.carousel_items) - 1
-            
+
         return self.current_item
 
     @property
@@ -137,7 +137,7 @@ class HumidityEntity(WeatherEntity):
         return WeatherEntityType.HUMIDITY
 
     def show_pixels(self, value):
-        # For square visual style we divide by 100 and multiply by 64 (8x8 screen resolution) 
+        # For square visual style we divide by 100 and multiply by 64 (8x8 screen resolution)
         # because humidity value is in percent
         if self.current_style is SquareStyle:
             value = 64 * value / 100
@@ -149,7 +149,7 @@ class PressureEntity(WeatherEntity):
 
     def __init__(self):
         super(PressureEntity, self).__init__()
-    
+
     @property
     def entity_messsage(self):
         return 'Pressure'
@@ -166,12 +166,12 @@ class PressureEntity(WeatherEntity):
     def entity_type(self):
         return WeatherEntityType.PRESSURE
 
-class TemperatureEntity(WeatherEntity):    
+class TemperatureEntity(WeatherEntity):
     """Temperature enity implementation."""
 
     def __init__(self):
         super(TemperatureEntity, self).__init__()
-    
+
     @property
     def entity_messsage(self):
         return 'Temperature'
