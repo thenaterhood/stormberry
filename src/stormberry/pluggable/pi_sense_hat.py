@@ -32,7 +32,6 @@ class RPiSenseHat(stormberry.plugin.ISensorPlugin):
 
     def __init__(self):
 
-        super(ISensorPlugin, self).__init__()
         self._sense_hat = None
         self._latest_reading = None
         self._temp_smoother = Smoother(self.SMOOTH_READINGS_NUMBER)
