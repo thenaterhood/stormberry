@@ -36,7 +36,7 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
         self._sense_hat = None
         self._latest_reading = None
 
-    def activate(self, config):
+    def prepare(self, config):
         """Activates sensors by requesting first values and assigning handlers."""
         self.config = config
 
@@ -65,7 +65,7 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
 
         return True
 
-    def deactivate(self):
+    def shutdown(self):
         """Tries to stop active threads and clean up screen."""
         if self._sense_hat:
             self._sense_hat.clear()

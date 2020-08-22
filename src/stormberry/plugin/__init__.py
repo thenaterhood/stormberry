@@ -28,7 +28,7 @@ class PluginDataManager():
 
 class IRepositoryPlugin(IPlugin):
 
-    def activate(self, config, data_manager):
+    def prepare(self, config, data_manager):
         '''
         Activate the plugin. This should set up whatever callbacks
         and connections this plugin intends to have in addition to
@@ -38,7 +38,7 @@ class IRepositoryPlugin(IPlugin):
         self.data_manager = data_manager
         return True
 
-    def deactivate(self):
+    def shutdown(self):
         '''
         Called on shutdown or to reinitialize. Expected to close
         all connections and files as needed for a clean shutdown.
@@ -63,7 +63,7 @@ class IRepositoryPlugin(IPlugin):
 
 class ISensorPlugin(IPlugin):
 
-    def activate(self, config, data_manager):
+    def prepare(self, config, data_manager):
         '''
         Activate the plugin. This should set up whatever callbacks
         and connections this plugin intends to have in addition to
@@ -73,7 +73,7 @@ class ISensorPlugin(IPlugin):
         self.data_manager = data_manager
         return True
 
-    def deactivate(self):
+    def shutdown(self):
         '''
         Called on shutdown or to reinitialize. Expected to close
         all connections and files as needed for a clean shutdown.
@@ -102,12 +102,12 @@ class IDisplayPlugin(IPlugin):
     identical to the repository plugin but does not allow reading weather data.
     '''
 
-    def activate(self, config, data_manager):
+    def prepare(self, config, data_manager):
         self.config = config
         self.data_manager = data_manager
         return True
 
-    def deactivate(self):
+    def shutdown(self):
         pass
 
     def update(self, weather_reading):

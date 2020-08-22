@@ -41,7 +41,7 @@ class RPiSenseHat(stormberry.plugin.ISensorPlugin):
         self._humid_smoother = Smoother(self.SMOOTH_READINGS_NUMBER)
         self._last_reading = None
 
-    def activate(self, config, data_manager):
+    def prepare(self, config, data_manager):
         """Activates sensors by requesting first values and assigning handlers."""
         self.config = config
 
@@ -56,7 +56,7 @@ class RPiSenseHat(stormberry.plugin.ISensorPlugin):
 
         return True
 
-    def deactivate(self):
+    def shutdown(self):
         """Tries to stop active threads and clean up screen."""
         if self._sense_hat:
             self._sense_hat.clear()

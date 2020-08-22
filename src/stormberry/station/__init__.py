@@ -23,18 +23,18 @@ class WeatherStation():
         self.plugin_manager = plugin_manager if plugin_manager is not None else PluginManager()
         self._latest_reading = None
 
-    def activate_sensors(self):
+    def prepare_sensors(self):
         for sensor in self.plugin_manager.getPluginsOfCategory('Sensor'):
-            sensor.plugin_object.activate(self.config, self.plugin_data_manager)
+            sensor.plugin_object.prepare(self.config, self.plugin_data_manager)
 
-    def activate_repositories(self):
+    def prepare_repositories(self):
         for repo in self.plugin_manager.getPluginsOfCategory('Repository'):
-            repo.plugin_object.activate(self.config, self.plugin_data_manager)
+            repo.plugin_object.prepare(self.config, self.plugin_data_manager)
 
-    def activate_displays(self):
+    def prepare_displays(self):
         if self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
             for display in self.plugin_manager.getPluginsOfCategory('Display'):
-                display.plugin_object.activate(self.config, self.plugin_data_manager)
+                display.plugin_object.prepare(self.config, self.plugin_data_manager)
 
     def start_station(self):
         """Launches multiple threads to handle configured behavior."""
@@ -43,7 +43,7 @@ class WeatherStation():
     def stop_station(self, *arg):
         """Tries to stop active threads and clean up screen."""
         for plugin in self.plugin_manager.getAllPlugins():
-            plugin.plugin_object.deactivate()
+            plugin.plugin_object.shutdown()
 
         if self._periodic_timer:
             self._periodic_timer.cancel()
