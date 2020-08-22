@@ -63,7 +63,8 @@ def main():
 
     plugin_manager.collectPlugins()
     plugins = plugin_manager.getAllPlugins()
-    logger.info("Loaded %d plugins" % len(plugins))
+    plugin_names = str([x.plugin_object.__class__.__name__ for x in plugins])
+    logger.info("Loaded %d plugins: %s" % (len(plugins), plugin_names))
     # Make sure we don't have an upload interval more than 3600 seconds
     if config.getint("GENERAL", "UPLOAD_INTERVAL") > 3600:
         logger.error('The application\'s upload interval cannot be greater than 3600 seconds')
