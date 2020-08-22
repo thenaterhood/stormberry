@@ -119,7 +119,8 @@ class RPiSenseHat(ISensorPlugin):
             try:
                 correction_factor = self.config.getfloat("GENERAL", "CPU_TEMP_FACTOR")
             except:
-                correction_factor = correction_factor if correction_factor else 5.466
+                correction_factor = 5.466
+
             adj_temp = avg_temp - ((cpu_temp - avg_temp) / correction_factor)
         else:
             adj_temp = avg_temp
