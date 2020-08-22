@@ -33,9 +33,10 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
         self._sense_hat = None
         self._latest_reading = None
 
-    def prepare(self, config):
+    def prepare(self, config, data_manager):
         """Activates sensors by requesting first values and assigning handlers."""
         self.config = config
+        self.data_manager = data_manager
 
         self._sense_hat = data_manager.get_entity('pi-sense-hat')
         if self._sense_hat is None:
