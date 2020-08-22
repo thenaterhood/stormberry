@@ -13,8 +13,7 @@
     Inspired by http://makezine.com/projects/raspberry-pi-weather-station-mount/ project
 ********************************************************************************************************************'''
 from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, ACTION_PRESSED, DIRECTION_MIDDLE
-from threading import Timer
-from abc import ABCMeta
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 import datetime
 import logging
