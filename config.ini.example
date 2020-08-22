@@ -1,39 +1,14 @@
 [GENERAL]
-;Runtime configuration
-WEATHER_UPLOAD=True
-;in seconds. default is 600,
-;10 minutes.
-UPLOAD_INTERVAL=600
-LOG_TO_CONSOLE=False
+CONSOLE_LOG_LEVEL=None
+FILE_LOG_LEVEL=Debug
+ENABLE_DISPLAY=True
 ;in seconds
-LOG_INTERVAL=5
-UPDATE_DISPLAY=True
-;in seconds
-UPDATE_INTERVAL=60
+UPDATE_INTERVAL=10
 LOGFILE=/tmp/stormberry.log
-;whether we should print weather
-;readings to the console
-WEATHER_TO_CONSOLE=True
 ;where stormberry should search for
 ;plugins. you may place this directory
 ;anywhere you like.
-PLUGIN_DIRECTORY=/usr/local/lib/stormberry/plugins
-
-;Visual styles configuration
-;red
-TEMP_POSITIVE=(255,0,0)
-;blue
-TEMP_NEGATIVE=(0,0,255)
-;green
-HUM_POSITIVE=(0,255,0)
-;white
-HUM_NEGATIVE=(255,255,255)
-;purple
-PRESS_POSITIVE=(148,0,211)
-;orange
-PRESS_NEGATIVE=(255,140,0)
-SCROLL_TEXT=True
-SCROLL_TEXT_SPEED=.05
+PLUGIN_DIRECTORY=/lib/stormberry/plugins_enabled
 ;Adjust for sensor inconsistencies
 ;with percents. To adjust up by 14%
 ;set to 1.14. To adjust down by 14%
@@ -53,6 +28,23 @@ ADJUST_TEMPERATURE_FOR_CPU=True
 ;when you start your station is inaccurate. Set
 ;this to true to discard it.
 DISCARD_FIRST_READING=True
+
+[PI_HAT_DISPLAY]
+;Visual styles configuration
+;red
+TEMP_POSITIVE=(255,0,0)
+;blue
+TEMP_NEGATIVE=(0,0,255)
+;green
+HUM_POSITIVE=(0,255,0)
+;white
+HUM_NEGATIVE=(255,255,255)
+;purple
+PRESS_POSITIVE=(148,0,211)
+;orange
+PRESS_NEGATIVE=(255,140,0)
+SCROLL_TEXT=True
+SCROLL_TEXT_SPEED=.05
 
 [CSV]
 FILENAME=weatherdata.csv

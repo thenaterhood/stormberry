@@ -1,0 +1,11 @@
+[Core]
+Name = Raspberry Pi Sense Hat Display
+Module = pi_sense_hat_display
+
+[Documentation]
+Author = Uladzislau Bayouski
+Version = 0.1
+Website = http://github.com/UBayouski/WeatherStation
+Description = Displays weather data on the Raspberry Pi Sense hat. This code is
+;primarily from the listed website, and has been repurposed into a plugin for
+;stormberry.

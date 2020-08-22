@@ -1,0 +1,11 @@
+[Core]
+Name = Raspberry Pi Sense Hat
+Module = pi_sense_hat
+
+[Documentation]
+Author = Uladzislau Bayouski
+Version = 0.1
+Website = http://github.com/UBayouski/WeatherStation
+Description = Gathers weather data from the Raspberry Pi Sense hat. This code is
+;primarily from the listed website, and has been repurposed into a plugin for
+;stormberry.

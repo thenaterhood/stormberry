@@ -1,12 +1,126 @@
+#!/usr/bin/python
 '''*****************************************************************************************************************
     Raspberry Pi + Raspbian Weather Station
     By Uladzislau Bayouski
     https://www.linkedin.com/in/uladzislau-bayouski-a7474111b/
 
-    Visual styles package.
-********************************************************************************************************************'''
+    A Raspberry Pi based weather station that measures temperature, humidity and pressure using
+    the Astro Pi Sense HAT then uploads the data to a Weather Underground weather station.
+    Calculates dew point. Completely configurable and working asyncroniously in multi threads.
+    Uses stick for choosing different weather entities and visual styles.
+    Uses logger to log runtime issues/errors.
 
+    Inspired by http://makezine.com/projects/raspberry-pi-weather-station-mount/ project
+********************************************************************************************************************'''
+from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, ACTION_PRESSED, DIRECTION_MIDDLE
 from abc import ABCMeta, abstractmethod, abstractproperty
+
+import datetime
+import logging
+import os
+import sys
+import time
+
+from stormberry.util.containers import CarouselContainer
+from stormberry.weather_reading import WeatherReading
+
+import stormberry.plugin
+
+class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
+
+    def __init__(self):
+
+        self._sense_hat = None
+        self._latest_reading = None
+        self.current_index = 0
+
+    def prepare(self, config, data_manager):
+        """Activates sensors by requesting first values and assigning handlers."""
+        self.config = config
+        self.data_manager = data_manager
+
+        self._sense_hat = SenseHat()
+        try:
+            data_manager.store_entity('pi-sense-hat', self._sense_hat)
+        except:
+            self._sense_hat = data_manager.get_entity('pi-sense-hat')
+
+        # Setup Sense Hat stick
+        self._sense_hat.stick.direction_up = self._change_weather_entity
+        self._sense_hat.stick.direction_down = self._change_weather_entity
+        self._sense_hat.stick.direction_left = self._change_weather_entity
+        self._sense_hat.stick.direction_right = self._change_weather_entity
+        self._sense_hat.stick.direction_middle = self._toggle_display
+
+        return True
+
+    def shutdown(self):
+        """Tries to stop active threads and clean up screen."""
+        if self._sense_hat:
+            self._sense_hat.clear()
+
+    @property
+    def carousel_items(self):
+        return (TemperatureEntity(self.config), HumidityEntity(self.config), PressureEntity(self.config))
+
+    @property
+    def current_style(self):
+        return self.current_item.current_style
+
+    @property
+    def latest_reading(self):
+        return self._latest_reading
+
+    def _toggle_display(self, event):
+        if event.action == ACTION_RELEASED:
+            self._sense_hat.clear()
+            if event.direction == DIRECTION_MIDDLE:
+                old_update_display = self.config.getboolean("GENERAL", "ENABLE_DISPLAY")
+                new_update_display = not old_update_display
+                self.config.set("GENERAL", "ENABLE_DISPLAY", str(new_update_display))
+
+    def _change_weather_entity(self, event):
+        """Internal. Switches to next/previous weather entity or next/previous visual style."""
+
+        # We need to handle release event state
+        if event.action == ACTION_RELEASED:
+            self._sense_hat.clear()
+
+            if event.direction == DIRECTION_UP:
+                next_entity = self.next_item
+                self._show_message(next_entity.entity_messsage, next_entity.positive_color)
+            elif event.direction == DIRECTION_DOWN:
+                previous_entity = self.previous_item
+                self._show_message(previous_entity.entity_messsage, previous_entity.positive_color)
+            elif event.direction == DIRECTION_LEFT:
+                self.current_item.previous_item
+            else:
+                self.current_item.next_item
+
+    def _show_message(self, message, message_color=(255,255,255), background_color=(0, 0, 0)):
+        """Internal. Shows message by scrolling it over HAT screen."""
+        # Need to be sure we revert any changes to rotation
+        self._sense_hat.rotation = 0
+        self._sense_hat.show_message(message, self.config.getfloat("PI_HAT_DISPLAY", "SCROLL_TEXT_SPEED"), message_color, background_color)
+
+    def update(self, weather_reading):
+        """Internal. Continuously updates screen with new sensors values."""
+
+        sensors_data = weather_reading
+
+        if sensors_data is not None:
+            if self.current_item.entity_type is WeatherEntityType.TEMPERATURE:
+                pixels = self.current_item.show_pixels(sensors_data.tempc)
+            elif self.current_item.entity_type is WeatherEntityType.HUMIDITY:
+                pixels = self.current_item.show_pixels(sensors_data.humidity)
+            else:
+                pixels = self.current_item.show_pixels(sensors_data.pressure_inHg)
+
+            self._sense_hat.set_rotation(self.current_style.rotation)
+            self._sense_hat.set_pixels(pixels)
+
+            self._latest_reading = sensors_data
+
 
 class VisualStyle(object):
     """Base class for all visual styles."""
@@ -200,7 +314,6 @@ class NumericStyle(VisualStyle):
 
         return result
 
-
 class SquareStyle(VisualStyle):
     """
     Square visual style implementation.
@@ -218,3 +331,121 @@ class SquareStyle(VisualStyle):
             return tuple(self._p if i < value else self._n for i in range(64))
 
         return tuple(self._n if i < -value else self._p for i in range(64))
+
+class WeatherEntityType(object):
+    """Enum object for weather enitites types."""
+    HUMIDITY, PRESSURE, TEMPERATURE = range(3)
+
+class WeatherEntity(CarouselContainer):
+    """Base class for weather entities implementations."""
+    __metaclass__ = ABCMeta
+
+    def __init__(self, config=None):
+        self.config = config
+        super(WeatherEntity, self).__init__()
+
+        # Default set of visual styles for weather entity instance
+        self._visual_styles = (
+            NumericStyle(self.positive_color, self.negative_color),
+            ArrowStyle(self.positive_color, self.negative_color),
+            SquareStyle(self.positive_color, self.negative_color)
+        )
+
+    @abstractproperty
+    def entity_messsage(self):
+        """Message to show when switching to it."""
+        pass
+
+    @abstractproperty
+    def positive_color(self):
+        """Color to use for positive values."""
+        pass
+
+    @abstractproperty
+    def negative_color(self):
+        """Color to use for negative values."""
+        pass
+
+    @abstractproperty
+    def entity_type(self):
+        """Returns WeatherEntityType value."""
+        pass
+
+    @property
+    def carousel_items(self):
+        return self._visual_styles
+
+    @property
+    def current_style(self):
+        """Current applied visual style."""
+        return self.current_item
+
+    def show_pixels(self, value):
+        """Shows pixel for current entity and applied visual style."""
+        return self.current_item.apply_style(value)
+
+class HumidityEntity(WeatherEntity):
+    """Humidity enity implementation."""
+
+    @property
+    def entity_messsage(self):
+        return 'Humidity'
+
+    @property
+    def positive_color(self):
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'HUM_POSITIVE')
+
+    @property
+    def negative_color(self):
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'HUM_NEGATIVE')
+
+    @property
+    def entity_type(self):
+        return WeatherEntityType.HUMIDITY
+
+    def show_pixels(self, value):
+        # For square visual style we divide by 100 and multiply by 64 (8x8 screen resolution)
+        # because humidity value is in percent
+        if self.current_style is SquareStyle:
+            value = 64 * value / 100
+
+        return super(HumidityEntity, self).show_pixels(value)
+
+class PressureEntity(WeatherEntity):
+    """Pressure enity implementation."""
+
+    @property
+    def entity_messsage(self):
+        return 'Pressure'
+
+    @property
+    def positive_color(self):
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'PRESS_POSITIVE')
+
+    @property
+    def negative_color(self):
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'PRESS_NEGATIVE')
+
+    @property
+    def entity_type(self):
+        return WeatherEntityType.PRESSURE
+
+class TemperatureEntity(WeatherEntity):
+    """Temperature enity implementation."""
+
+    @property
+    def entity_messsage(self):
+        return 'Temperature'
+
+    @property
+    def positive_color(self):
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'TEMP_POSITIVE')
+
+    @property
+    def negative_color(self):
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'TEMP_NEGATIVE')
+
+    @property
+    def entity_type(self):
+        return WeatherEntityType.TEMPERATURE
+

@@ -1,6 +1,6 @@
 # Stormberry
 
-Configurable and extensible Raspberry Pi weather station software with
+Configurable and extensible weather station software with
 support for plugins.
 
 Collects temperature, humidity, pressure. Calculates dewpoint.
@@ -11,7 +11,7 @@ Based on code from (Uladzislau Bayouski)[https://www.linkedin.com/in/uladzislau-
 * Python3
 * setuptools
 * yapsy
-* astro-pi
+* astro-pi (if using the pi-hat)
 
 ## Installation
 Clone this repository, then run `sudo pip3 install -e .`. If that doesn't work or
@@ -19,28 +19,53 @@ you prefer to use the setup.py directly, you can also run `sudo python3 setup.py
 However, if you use the setup.py directly you will need to manually install the
 requirements.
 
+Depending on your environment, you may need to run `sudo python3 setup.py install` to install
+the plugin directories.
+
 ## Configuration
-The stormberry configuration file can be found at either /etc/stormberry/config.ini
-or /usr/local/etc/stormberry/config.ini depending on your system.
+By default, stormberry will run as a user (which you will need to create) called
+`rouser` which is intended to be a nonprivileged user. You can change this by
+overriding the service file in typical systemd fashion.
+
+Copy the configuration file (installed as /etc/stormberry/config.ini.example or
+/usr/local/etc/stormberry/config.ini.example) to config.ini in the same directory.
+
 Options are documented directly in the file.
 
-Plugins can be enabled by placing them (the .py and the .yapsy-plugin files) in
-/usr/local/lib/stormberry/plugins. There are no plugins enabled by default - you can
-copy them from the `plugins` directory (or from
-/usr/local/lib/python3.5/dist-packages/stormberry/plugin_examples). Plugins
-shipped with stormberry include a Wunderground uploader, CSV file creator, Google Sheets uploader, and
-a SQLite database writer.
+Stormberry provides a handful of sensor, display, and storage plugins. These are installed
+by default into /lib/stormberry/plugins_available (or some permutation depending on your
+system). All are disabled by default.
 
-If that directory does not exist, feel free to create it or update the config
-file to use a different plugin directory.
+To enable a plugin, copy or create a symlink to its .py and .yapsy-plugin file in
+/lib/stormberry/plugins_enabled (if using the default path - this directory is
+configurable). To create a plugin, follow the example of any of the provided plugins
+and enable it in the same way. Restart stormberry for the change to take effect.
+
+Some of the plugins have configuration options in the main config.ini file.
 
 ## Building Plugins
 stormberry uses yapsy for plugins.
 
-To create a new plugin class, you must extend both `stormberry.GenericPlugin.GenericPlugin`
-and `yapsy.IPlugin.IPlugin`. Make sure to implement the methods in the stormberry
-GenericPlugin interface. You will also need to create a yapsy-plugin info file
-for your plugin (examples are available in the `plugins` directory).
+To create a new plugin, you must decide if it is a display, sensor, or repository.
+
+* A display is intended to show weather data and is called when a new reading is available.
+Extend the stormberry.plugin.IDisplay class and implement its methods.
+* A sensor is intended to gather data. It is periodically called, and its results are
+merged with that of other sensors - beware, if you use multiple sensors at a time. Extend
+the stormberry.plugin.ISensor class and implement its methods.
+* A repository is for storing data and (if you like) reading it back, and is called
+any time a new reading is available. Extend the
+stormberry.plugin.IRepository class and implement its methods.
+
+If you have plugins that need to share a resource (in the provided plugins, the
+Pi Sense Hat plugins for sensors and display are separate, but share the hat), there
+is a plugin data manager. It's passed to your plugin in the activate method and
+has methods for setting and getting objects.
+
+The "universal" object that plugins must understand is the WeatherReading object.
+Plugins don't need to use or understand all the fields, so if you're adding a new
+type of sensor, you may need to expand the data storage plugins you're interested
+in to store your data.
 
 You may use your own configuration file (you will need to load it yourself) or
 add options to the main stormberry file - placing them in their own section is
