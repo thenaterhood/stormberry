@@ -19,7 +19,7 @@ js_files = glob.glob('src/stormberry/server/static/assets/js/*.*')
 css_files = glob.glob('src/stormberry/server/static/assets/css/*.*')
 
 data_files =[
-        ('/etc/stormberry', ['config.ini']),
+        ('/etc/stormberry', ['config.ini.example']),
         ('/lib/stormberry/plugins_available', ['README.md']),
         ('/lib/stormberry/plugins_enabled', ['README.md']),
         ('/lib/stormberry/plugins_available', yapsy_files),
