@@ -44,7 +44,7 @@ class RPiSenseHat(stormberry.plugin.ISensorPlugin):
 
         self._sense_hat = SenseHat()
         try:
-            data_manager.store_entity('pi-hat', self._sense_hat)
+            data_manager.store_entity('pi-sense-hat', self._sense_hat)
         except:
             self._sense_hat = data_manager.get_entity('pi-sense-hat')
 
