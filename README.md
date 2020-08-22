@@ -27,8 +27,9 @@ By default, stormberry will run as a user (which you will need to create) called
 `rouser` which is intended to be a nonprivileged user. You can change this by
 overriding the service file in typical systemd fashion.
 
-The stormberry configuration file can be found at either /etc/stormberry/config.ini
-or /usr/local/etc/stormberry/config.ini depending on your system.
+Copy the configuration file (installed as /etc/stormberry/config.ini.example or
+/usr/local/etc/stormberry/config.ini.example) to config.ini in the same directory.
+
 Options are documented directly in the file.
 
 Stormberry provides a handful of sensor, display, and storage plugins. These are installed

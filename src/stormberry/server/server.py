@@ -17,7 +17,7 @@ app.register_blueprint(comfort_blueprint, url_prefix="/comfort")
 
 @app.route('/')
 def send_index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory('/lib/stormberry/static_files', 'index.html')
 
 def demo():
     '''
