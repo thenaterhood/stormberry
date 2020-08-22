@@ -75,9 +75,9 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
         if event.action == ACTION_RELEASED:
             self._sense_hat.clear()
             if event.direction == DIRECTION_MIDDLE:
-                old_update_display = self.config.getboolean("GENERAL", "UPDATE_DISPLAY")
+                old_update_display = self.config.getboolean("GENERAL", "ENABLE_DISPLAY")
                 new_update_display = not old_update_display
-                self.config.set("GENERAL", "UPDATE_DISPLAY", str(new_update_display))
+                self.config.set("GENERAL", "ENABLE_DISPLAY", str(new_update_display))
 
     def _change_weather_entity(self, event):
         """Internal. Switches to next/previous weather entity or next/previous visual style."""
@@ -101,7 +101,7 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
         """Internal. Shows message by scrolling it over HAT screen."""
         # Need to be sure we revert any changes to rotation
         self._sense_hat.rotation = 0
-        self._sense_hat.show_message(message, self.config.getfloat("GENERAL", "SCROLL_TEXT_SPEED"), message_color, background_color)
+        self._sense_hat.show_message(message, self.config.getfloat("PI_HAT_DISPLAY", "SCROLL_TEXT_SPEED"), message_color, background_color)
 
     def update(self, weather_reading):
         """Internal. Continuously updates screen with new sensors values."""
@@ -393,11 +393,11 @@ class HumidityEntity(WeatherEntity):
 
     @property
     def positive_color(self):
-        return self.config.getinttuple('GENERAL', 'HUM_POSITIVE')
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'HUM_POSITIVE')
 
     @property
     def negative_color(self):
-        return self.config.getinttuple('GENERAL', 'HUM_NEGATIVE')
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'HUM_NEGATIVE')
 
     @property
     def entity_type(self):
@@ -420,11 +420,11 @@ class PressureEntity(WeatherEntity):
 
     @property
     def positive_color(self):
-        return self.config.getinttuple('GENERAL', 'PRESS_POSITIVE')
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'PRESS_POSITIVE')
 
     @property
     def negative_color(self):
-        return self.config.getinttuple('GENERAL', 'PRESS_NEGATIVE')
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'PRESS_NEGATIVE')
 
     @property
     def entity_type(self):
@@ -439,11 +439,11 @@ class TemperatureEntity(WeatherEntity):
 
     @property
     def positive_color(self):
-        return self.config.getinttuple('GENERAL', 'TEMP_POSITIVE')
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'TEMP_POSITIVE')
 
     @property
     def negative_color(self):
-        return self.config.getinttuple('GENERAL', 'TEMP_NEGATIVE')
+        return self.config.getinttuple('PI_HAT_DISPLAY', 'TEMP_NEGATIVE')
 
     @property
     def entity_type(self):

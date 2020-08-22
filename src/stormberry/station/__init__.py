@@ -32,7 +32,7 @@ class WeatherStation():
             repo.plugin_object.prepare(self.config, self.plugin_data_manager)
 
     def prepare_displays(self):
-        if self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
+        if self.config.getboolean("GENERAL", "ENABLE_DISPLAY"):
             for display in self.plugin_manager.getPluginsOfCategory('Display'):
                 display.plugin_object.prepare(self.config, self.plugin_data_manager)
 
@@ -66,7 +66,7 @@ class WeatherStation():
 
     def report_reading(self, reading):
 
-        if self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
+        if self.config.getboolean("GENERAL", "ENABLE_DISPLAY"):
             for display in self.plugin_manager.getPluginsOfCategory('Display'):
                 display.plugin_object.update(reading)
 

@@ -25,11 +25,31 @@ class SignalHandling(object):
         # that's needed right now, so we'll do nothing.
         pass
 
+def set_handler_level_from_str(logger, level_name):
+    try:
+        logger.setLevel(level_name.upper())
+    except:
+        logger.setLevel(logging.CRITICAL)
+
 def main():
     config = Config()
+    log_level = logging.INFO
+    try:
+        cfg_console_log_level = config.get("GENERAL", "CONSOLE_LOG_LEVEL")
+    except:
+        cfg_console_log_level = "Critical"
+
+    try:
+        cfg_file_log_level = config.get("GENERAL", "FILE_LOG_LEVEL")
+    except:
+        cfg_file_log_level = "Info"
+
     plugin_manager = PluginManager()
-    logger = logging.getLogger('stormberry')
-    logger.setLevel(logging.DEBUG)
+    stormberry_logger = logging.getLogger('stormberry')
+    stormberry_logger.setLevel(logging.DEBUG)
+
+    yapsy_logger = logging.getLogger('yapsy')
+    yapsy_logger.setLevel(logging.DEBUG)
 
     try:
         filehandler = logging.handlers.TimedRotatingFileHandler(
@@ -41,15 +61,22 @@ def main():
                 filename="/tmp/stormberry.log",
                 when="W0"
                 )
-
-    formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(name)s;%(message)s",
-            "%Y-%m-%d %H:%M:%S")
-    filehandler.setFormatter(formatter)
-    logger.addHandler(filehandler)
-
     termhandler = logging.StreamHandler(sys.stdout)
     termhandler.setLevel(logging.INFO)
-    logger.addHandler(termhandler)
+
+    formatter = logging.Formatter("%(asctime)s [%(levelname)s][%(name)s]:%(message)s",
+            "%Y-%m-%d %H:%M:%S")
+    filehandler.setFormatter(formatter)
+    termhandler.setFormatter(formatter)
+
+    stormberry_logger.addHandler(filehandler)
+    stormberry_logger.addHandler(termhandler)
+
+    yapsy_logger.addHandler(filehandler)
+    yapsy_logger.addHandler(termhandler)
+
+    set_handler_level_from_str(filehandler, cfg_file_log_level)
+    set_handler_level_from_str(termhandler, cfg_console_log_level)
 
     plugin_manager.setPluginPlaces(
             [config.get("GENERAL", "PLUGIN_DIRECTORY")]
@@ -64,30 +91,25 @@ def main():
     plugin_manager.collectPlugins()
     plugins = plugin_manager.getAllPlugins()
     plugin_names = str([x.plugin_object.__class__.__name__ for x in plugins])
-    logger.info("Loaded %d plugins: %s" % (len(plugins), plugin_names))
-    # Make sure we don't have an upload interval more than 3600 seconds
-    if config.getint("GENERAL", "UPLOAD_INTERVAL") > 3600:
-        logger.error('The application\'s upload interval cannot be greater than 3600 seconds')
-
-        sys.exit(1)
+    stormberry_logger.info("Loaded %d plugins: %s" % (len(plugins), plugin_names))
 
     plugin_data_manager = PluginDataManager()
     try:
-        station = WeatherStation(plugin_manager, config, plugin_data_manager, logger)
+        station = WeatherStation(plugin_manager, config, plugin_data_manager, stormberry_logger)
 
         station.prepare_sensors()
         station.prepare_repositories()
         station.prepare_displays()
 
-        logger.info('Successfully initialized sensors')
+        stormberry_logger.info('Successfully initialized sensors')
 
         with SignalHandling(station) as sh:
             station.start_station()
-            logger.info('Weather Station successfully launched')
+            stormberry_logger.info('Weather Station successfully launched')
             signal.pause()
 
     except Exception as e:
-        logger.critical(e)
+        stormberry_logger.critical(e)
         station.stop_station()
 
         sys.exit(0)
