@@ -35,7 +35,7 @@ def grafana_query():
     readings = weather_list_to_dict_list(repo.get_between(req['range']['from'], req['range']['to']))
     for r in readings:
         time_obj = datetime.datetime.strptime(r['timestr'], '%Y-%m-%d %H:%M:%S')
-        grafana_ts = int(r.timestamp.timestamp() * 1000)
+        grafana_ts = int(time_obj.timestamp() * 1000)
         r['grafana_ts'] = grafana_ts
 
     if target == "Outdoor Temperature (C)":
