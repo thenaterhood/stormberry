@@ -30,7 +30,6 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
 
     def __init__(self):
 
-        super(IDisplayPlugin, self).__init__()
         self._sense_hat = None
         self._latest_reading = None
 
