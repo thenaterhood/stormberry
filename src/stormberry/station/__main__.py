@@ -45,7 +45,7 @@ def main():
         cfg_file_log_level = "Info"
 
     plugin_manager = PluginManager()
-    stormberry_logger = logging.getLogger('stormberry')
+    stormberry_logger = logging.getLogger('stormberry-station')
     stormberry_logger.setLevel(logging.DEBUG)
 
     yapsy_logger = logging.getLogger('yapsy')
