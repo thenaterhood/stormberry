@@ -14,6 +14,7 @@
 ********************************************************************************************************************'''
 from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, ACTION_PRESSED, DIRECTION_MIDDLE
 from threading import Timer
+from abc import ABCMeta
 
 import datetime
 import logging
