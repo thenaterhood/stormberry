@@ -53,10 +53,6 @@ class RPiSenseHat(ISensorPlugin):
         self._sense_hat.get_humidity()
         self._sense_hat.get_pressure()
 
-        """Launches multiple threads to handle configured behavior."""
-        if self.config.getboolean("GENERAL", "WEATHER_UPLOAD") and self.config.getint("GENERAL", "UPLOAD_INTERVAL"):
-            self._report_new_reading()
-
         return True
 
     def deactivate(self):
