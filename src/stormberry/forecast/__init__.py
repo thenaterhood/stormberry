@@ -23,6 +23,10 @@ class WeatherForecaster:
 
         datestr = three_hours_ago.strftime("%Y-%m-%d %H:%M:%S")
         readings = self.repo.get_between(datestr)
+
+        if len(readings) < 2:
+            return None
+
         pressures = [x.pressure_inHg for x in readings]
         times = [x.timestamp.timestamp() for x in readings]
         mean_pressure = sum(pressures) / len(pressures) if len(pressures) > 1 else 1
