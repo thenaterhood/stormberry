@@ -38,10 +38,11 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
         self.config = config
         self.data_manager = data_manager
 
-        self._sense_hat = data_manager.get_entity('pi-sense-hat')
-        if self._sense_hat is None:
-            self._sense_hat = SenseHat()
+        self._sense_hat = SenseHat()
+        try:
             data_manager.store_entity('pi-hat', self._sense_hat)
+        except:
+            self._sense_hat = data_manager.get_entity('pi-sense-hat')
 
         # Scroll Init message over HAT screen
         self._show_message('Init Sensors', (255, 255, 0), (0, 0, 255))

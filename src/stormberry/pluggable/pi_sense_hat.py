@@ -43,10 +43,11 @@ class RPiSenseHat(stormberry.plugin.ISensorPlugin):
         """Activates sensors by requesting first values and assigning handlers."""
         self.config = config
 
-        self._sense_hat = data_manager.get_entity('pi-sense-hat')
-        if self._sense_hat is None:
-            self._sense_hat = SenseHat()
+        self._sense_hat = SenseHat()
+        try:
             data_manager.store_entity('pi-hat', self._sense_hat)
+        except:
+            self._sense_hat = data_manager.get_entity('pi-sense-hat')
 
         # Init sensors, to be sure first effective run uses correct sensors values
         self._sense_hat.get_humidity()
