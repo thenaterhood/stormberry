@@ -116,8 +116,10 @@ class RPiSenseHat(ISensorPlugin):
             # Get the CPU temperature
             cpu_temp = self._get_cpu_temp()
             # Calculate temperature compensating for CPU heating
-            correction_factor = self.config.getfloat("GENERAL", "CPU_TEMP_FACTOR")
-            correction_factor = correction_factor if correction_factor else 5.466
+            try:
+                correction_factor = self.config.getfloat("GENERAL", "CPU_TEMP_FACTOR")
+            except:
+                correction_factor = correction_factor if correction_factor else 5.466
             adj_temp = avg_temp - ((cpu_temp - avg_temp) / correction_factor)
         else:
             adj_temp = avg_temp
