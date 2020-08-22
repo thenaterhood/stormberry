@@ -75,9 +75,9 @@ def main():
     try:
         station = WeatherStation(plugin_manager, config, plugin_data_manager, logger)
 
-        station.activate_sensors()
-        station.activate_repositories()
-        station.activate_displays()
+        station.prepare_sensors()
+        station.prepare_repositories()
+        station.prepare_displays()
 
         logger.info('Successfully initialized sensors')
 
