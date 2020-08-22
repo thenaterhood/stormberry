@@ -42,7 +42,8 @@ setup(name='stormberry',
         'stormberry',
         'stormberry.station',
         'stormberry.plugin',
-        'stormberry.pluggable'
+        'stormberry.pluggable',
+        'stormberry.util'
         ],
     data_files=data_files,
     package_data={
