@@ -69,6 +69,8 @@ class ISensorPlugin(IPlugin):
         and connections this plugin intends to have in addition to
         the two defined by stormberry's plugin API.
         '''
+        self.config = config
+        self.data_manager = data_manager
         return True
 
     def deactivate(self):
@@ -101,6 +103,8 @@ class IDisplayPlugin(IPlugin):
     '''
 
     def activate(self, config, data_manager):
+        self.config = config
+        self.data_manager = data_manager
         return True
 
     def deactivate(self):

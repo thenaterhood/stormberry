@@ -2,10 +2,10 @@ import logging
 import gspread
 import json
 from oauth2client.service_account import ServiceAccountCredentials
-from stormberry.plugin import IRepositoryPlugin
+import stormberry.plugin
 
 
-class GSheetUploader(IRepositoryPlugin):
+class GSheetUploader(stormberry.plugin.IRepositoryPlugin):
     '''
     Based on code from https://www.hackster.io/idreams/make-a-mini-weather-station-with-a-raspberry-pi-447866
     '''

@@ -1,10 +1,10 @@
 import urllib2
 import logging
-from stormberry.plugin import IRepositoryPlugin
+import stormberry.plugin
 from urllib import urlencode
 
 
-class WundergroundUploader(IRepositoryPlugin):
+class WundergroundUploader(stormberry.plugin.IRepositoryPlugin):
 
     def store_reading(self, data):
         """Internal. Continuously uploads new sensors values to Weather Underground."""

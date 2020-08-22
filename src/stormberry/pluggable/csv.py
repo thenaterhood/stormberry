@@ -1,8 +1,8 @@
 import csv
 import os
-from stormberry.plugin import IRepositoryPlugin
+import stormberry.plugin
 
-class CSVWriter(IRepositoryPlugin):
+class CSVWriter(stormberry.plugin.IRepositoryPlugin):
 
     def activate(self, config, data_manager):
         self.config = config

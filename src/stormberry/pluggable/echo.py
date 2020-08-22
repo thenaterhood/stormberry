@@ -1,6 +1,6 @@
-from stormberry.plugin import IRepositoryPlugin
+import stormberry.plugin
 
-class Echo(IRepositoryPlugin):
+class Echo(stormberry.plugin.IRepositoryPlugin):
 
     def store_reading(self, data):
         print(data)

@@ -26,9 +26,9 @@ from stormberry.config import Config
 from stormberry.util.containers import CarouselContainer
 from stormberry.weather_reading import WeatherReading
 
-from stormberry.plugin import IDisplayPlugin
+import stormberry.plugin
 
-class RPiSenseHatDisplay(IDisplayPlugin, CarouselContainer):
+class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
 
     def __init__(self):
 

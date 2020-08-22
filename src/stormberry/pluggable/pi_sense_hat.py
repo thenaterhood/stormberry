@@ -25,9 +25,9 @@ from stormberry.config import Config
 from stormberry.weather_reading import WeatherReading
 from stormberry.smoother import Smoother
 
-from stormberry.plugin import ISensorPlugin
+import stormberry.plugin
 
-class RPiSenseHat(ISensorPlugin):
+class RPiSenseHat(stormberry.plugin.ISensorPlugin):
 
     # Constants
     SMOOTH_READINGS_NUMBER = 3

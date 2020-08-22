@@ -1,8 +1,8 @@
 import sqlite3
 import os
-from stormberry.plugin import IRepositoryPlugin
+import stormberry.plugin
 
-class SQLite3Store(IRepositoryPlugin):
+class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
 
     create_query = "CREATE TABLE IF NOT EXISTS weather_data(id INTEGER PRIMARY KEY ASC, timestr, tempc, inchesHg, humidity, dewpointc)"
     insert_query = "INSERT INTO weather_data(timestr, tempc, inchesHg, humidity, dewpointc) VALUES (:timestr, :tempc, :inchesHg, :humidity, :dewpointc)"

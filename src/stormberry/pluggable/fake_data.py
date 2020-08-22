@@ -1,10 +1,10 @@
 from datetime import datetime
 from random import randint
-from stormberry.plugin import ISensorPlugin
+import stormberry.plugin
 from stormberry.weather_reading import WeatherReading
 
 
-class FakeData(ISensorPlugin):
+class FakeData(stormberry.plugin.ISensorPlugin):
 
     def get_reading(self):
 
