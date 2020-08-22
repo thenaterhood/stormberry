@@ -11,6 +11,6 @@ class FakeData(stormberry.plugin.ISensorPlugin):
         return WeatherReading(
                 tempc=randint(-5, 30),
                 humidity=randint(0, 100),
-                pressure=randint(980, 1049),
+                pressureMillibars=randint(980, 1049),
                 date=datetime.now()
             )

@@ -1,0 +1,21 @@
+body {
+    margin-left: 25%;
+    margin-top: 55px;
+    width: 50%;
+    font-family: Helvetica, Arial, sans-serif;
+}
+
+@media screen and (min-width: 1081px) {
+    body {
+       margin-left: 25%;
+       width: 50%;
+    }
+}
+
+@media screen and (max-width: 1080px) {
+    body {
+       margin-left: 5%;
+       width: 90%;
+       font-size: 2em;
+    }
+}

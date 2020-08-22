@@ -81,10 +81,10 @@ class RPiSenseHat(stormberry.plugin.ISensorPlugin):
             humidity = self._humid_smoother.smooth(humidity)
 
         wr = WeatherReading(
-                temp_in_celsius,
-                humidity,
-                self._sense_hat.get_pressure(),
-                datetime.datetime.now()
+                tempc=temp_in_celsius,
+                humidity=humidity,
+                pressureMillibars=self._sense_hat.get_pressure(),
+                date=datetime.datetime.now()
                 )
 
         self._last_reading = wr

@@ -8,9 +8,9 @@ import time
 
 from stormberry.config import Config
 from stormberry.plugin import PluginDataManager
+from stormberry.plugin.manager import PluginTypeName, get_plugin_manager
 from stormberry.weather_reading import WeatherReading
 
-from yapsy import PluginManager
 
 class WeatherStation():
 
@@ -20,20 +20,20 @@ class WeatherStation():
         self.log = log if log is not None else logging
         self.config = config if config is not None else Config()
         self.plugin_data_manager = plugin_data_manager if plugin_data_manager is not None else PluginDataManager()
-        self.plugin_manager = plugin_manager if plugin_manager is not None else PluginManager()
+        self.plugin_manager = plugin_manager if plugin_manager is not None else get_plugin_manager(self.config)
         self._latest_reading = None
 
     def prepare_sensors(self):
-        for sensor in self.plugin_manager.getPluginsOfCategory('Sensor'):
+        for sensor in self.plugin_manager.getPluginsOfCategory(PluginTypeName.SENSOR):
             sensor.plugin_object.prepare(self.config, self.plugin_data_manager)
 
     def prepare_repositories(self):
-        for repo in self.plugin_manager.getPluginsOfCategory('Repository'):
+        for repo in self.plugin_manager.getPluginsOfCategory(PluginTypeName.REPOSITORY):
             repo.plugin_object.prepare(self.config, self.plugin_data_manager)
 
     def prepare_displays(self):
         if self.config.getboolean("GENERAL", "ENABLE_DISPLAY"):
-            for display in self.plugin_manager.getPluginsOfCategory('Display'):
+            for display in self.plugin_manager.getPluginsOfCategory(PluginTypeName.DISPLAY):
                 display.plugin_object.prepare(self.config, self.plugin_data_manager)
 
     def start_station(self):
@@ -49,14 +49,9 @@ class WeatherStation():
             self._periodic_timer.cancel()
 
     def take_reading(self):
-        final_reading = WeatherReading(
-                None,
-                None,
-                None,
-                None
-                )
+        final_reading = WeatherReading()
 
-        for sensor in self.plugin_manager.getPluginsOfCategory('Sensor'):
+        for sensor in self.plugin_manager.getPluginsOfCategory(PluginTypeName.SENSOR):
             reading = sensor.plugin_object.get_reading()
             if reading is not None:
                 final_reading.merge(reading)
@@ -67,13 +62,13 @@ class WeatherStation():
     def report_reading(self, reading):
 
         if self.config.getboolean("GENERAL", "ENABLE_DISPLAY"):
-            for display in self.plugin_manager.getPluginsOfCategory('Display'):
+            for display in self.plugin_manager.getPluginsOfCategory(PluginTypeName.DISPLAY):
                 display.plugin_object.update(reading)
 
         if self._latest_reading is None and self.config.getboolean("GENERAL", "DISCARD_FIRST_READING"):
             return
 
-        for repo in self.plugin_manager.getPluginsOfCategory('Repository'):
+        for repo in self.plugin_manager.getPluginsOfCategory(PluginTypeName.REPOSITORY):
             repo.plugin_object.store_reading(reading)
 
     def _periodic_callback(self):

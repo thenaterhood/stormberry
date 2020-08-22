@@ -60,6 +60,51 @@ class IRepositoryPlugin(IPlugin):
         '''
         return True
 
+    def get_latest(self):
+        '''
+        Gets the most recent reading from the data
+        source.
+
+        @return dict
+        '''
+        return None
+
+    def get_between(self, start_time, end_time = None):
+        '''
+        Gets the weather readings between a start and
+        optional end time. If end time is omitted,
+        the end_time will be the most recent reading.
+
+        @param start_time string
+        @param end_time string
+        @return []
+        '''
+        return []
+
+    def get_mean_between(self, start_time, end_time = None):
+        '''
+        Gets the means for the readings between a start
+        and optional end time. If end time is omitted,
+        the end_time will be the most recent reading.
+
+        @param start_time string
+        @param end_time string
+        @return []
+        '''
+        return []
+
+    def get_extremes_between(self, start_time, end_time = None):
+        '''
+        Gets the means for the readings between a start
+        and optional end time. If end time is omitted,
+        the end_time will be the most recent reading.
+
+        @param start_time string
+        @param end_time string
+        @return []
+        '''
+        return []
+
 
 class ISensorPlugin(IPlugin):
 

@@ -4,7 +4,7 @@ import signal
 import sys
 from stormberry.station import WeatherStation
 from stormberry.plugin import ISensorPlugin, IRepositoryPlugin, IDisplayPlugin, PluginDataManager
-from yapsy.PluginManager import PluginManager
+from stormberry.plugin.manager import get_plugin_manager
 
 
 class SignalHandling(object):
@@ -44,7 +44,6 @@ def main():
     except:
         cfg_file_log_level = "Info"
 
-    plugin_manager = PluginManager()
     stormberry_logger = logging.getLogger('stormberry-station')
     stormberry_logger.setLevel(logging.DEBUG)
 
@@ -78,17 +77,8 @@ def main():
     set_handler_level_from_str(filehandler, cfg_file_log_level)
     set_handler_level_from_str(termhandler, cfg_console_log_level)
 
-    plugin_manager.setPluginPlaces(
-            [config.get("GENERAL", "PLUGIN_DIRECTORY")]
-            )
+    plugin_manager = get_plugin_manager(config)
 
-    plugin_manager.setCategoriesFilter({
-        'Sensor': ISensorPlugin,
-        'Repository': IRepositoryPlugin,
-        'Display': IDisplayPlugin
-    })
-
-    plugin_manager.collectPlugins()
     plugins = plugin_manager.getAllPlugins()
     plugin_names = str([x.plugin_object.__class__.__name__ for x in plugins])
     stormberry_logger.info("Loaded %d plugins: %s" % (len(plugins), plugin_names))

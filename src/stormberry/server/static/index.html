@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <script src="/config.js"></script>
+        <script>
+var proto = String.fromCharCode(104,116,116,112,115,58);
+if (window.location.protocol != proto && CONFIG.redirect_to_https) {
+    window.location.href = proto + window.location.href.substring(window.location.protocol.length);
+}
+        </script>
+        <link rel="stylesheet" href="/assets/css/style.css" />
+        <script src="/assets/js/jquery-3.1.0.min.js"></script>
+        <script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+        <title>Stormberry Weather</title>
+    </head>
+
+    <body>
+        <h1>Current Weather</h1>
+        <noscript>
+            <p>This website requires Javascript</p>
+        </noscript>
+
+        <p><span class="current-comfort"></span> Current conditions are <span class="current-temp-f"></span>F/<span class="current-temp"></span>C, with humidity <span class="current-humidity"></span>% and dewpoint <span class="current-dewpoint-f"></span>F/<span class="current-dewpoint"></span>C.</p>
+        <p><span class="basic-prediction"></span> <span class="basic-temp-trend"></span></p>
+        <p><span class="safe-to-run"></span></p>
+        <hr />
+        <h1>24-hour Conditions</h1>
+        <div id="hourlyDewpointChart"></div>
+        <hr />
+        <p>Last weather reading was <span class="latest-datapoint-time"></span>. Comfort reading based on <span class="sc-method"></span>.</p>
+
+    <script src="../assets/js/stormberry.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+            preparePage();
+        });
+
+        function preparePage() {
+
+            // Javascript method's body can be found in assets/js/demos.js
+            //            demo.initDashboardPageCharts();
+
+            let displaySection = decodeURIComponent(location.hash.substring(1));
+            $('.dynamic-item').addClass('hidden');
+            $('.nav-item').removeClass('active');
+
+            switch(displaySection) {
+                case "":
+                case "current-conditions":
+                    stormberry.displayLatestComfort();
+                    stormberry.displayLatestCondition();
+                    stormberry.displayBasicPrediction();
+                    stormberry.initConditionCharts();
+                    $('.current-conditions').removeClass('hidden');
+                    $('.current-conditions-nav').addClass('active');
+                    break;
+                case "past-week":
+                    stormberry.displayWeeklyCharts();
+                    stormberry.displayWeeklyTrends();
+                    $('.past-week-nav').addClass('active');
+                    $('.past-week').removeClass('hidden');
+                    break;
+            }
+        }
+
+        window.addEventListener("hashchange", preparePage);
+    </script>
+
+    </body>
+</html>
