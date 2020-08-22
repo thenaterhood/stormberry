@@ -39,6 +39,7 @@ class RPiSenseHat(ISensorPlugin):
         self._latest_reading = None
         self._temp_smoother = Smoother(self.SMOOTH_READINGS_NUMBER)
         self._humid_smoother = Smoother(self.SMOOTH_READINGS_NUMBER)
+        self._last_reading = None
 
     def activate(self, config, data_manager):
         """Activates sensors by requesting first values and assigning handlers."""
@@ -77,7 +78,7 @@ class RPiSenseHat(ISensorPlugin):
         humidity = self._get_humidity()
 
         # Average out value across the last three readings
-        if (smooth):
+        if (self._last_reading is None):
             temp_in_celsius = self._temp_smoother.smooth(temp_in_celsius)
             humidity = self._humid_smoother.smooth(humidity)
 
@@ -88,6 +89,7 @@ class RPiSenseHat(ISensorPlugin):
                 datetime.datetime.now()
                 )
 
+        self._last_reading = wr
         return wr
 
     def get_health(self):
