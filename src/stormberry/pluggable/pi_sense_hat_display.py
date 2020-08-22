@@ -12,7 +12,6 @@
 
     Inspired by http://makezine.com/projects/raspberry-pi-weather-station-mount/ project
 ********************************************************************************************************************'''
-from __future__ import print_function
 from sense_hat import SenseHat, ACTION_RELEASED, DIRECTION_UP, DIRECTION_DOWN, DIRECTION_LEFT, DIRECTION_RIGHT, ACTION_PRESSED, DIRECTION_MIDDLE
 from threading import Timer
 
@@ -22,7 +21,6 @@ import os
 import sys
 import time
 
-from stormberry.config import Config
 from stormberry.util.containers import CarouselContainer
 from stormberry.weather_reading import WeatherReading
 
@@ -356,7 +354,7 @@ class WeatherEntity(CarouselContainer):
     __metaclass__ = ABCMeta
 
     def __init__(self, config=None):
-        self.config = config if config is not None else Config()
+        self.config = config
         super(WeatherEntity, self).__init__()
 
         # Default set of visual styles for weather entity instance

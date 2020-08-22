@@ -12,7 +12,6 @@
 
     Inspired by http://makezine.com/projects/raspberry-pi-weather-station-mount/ project
 ********************************************************************************************************************'''
-from __future__ import print_function
 from sense_hat import SenseHat
 
 import datetime
@@ -21,7 +20,6 @@ import os
 import sys
 import time
 
-from stormberry.config import Config
 from stormberry.weather_reading import WeatherReading
 from stormberry.smoother import Smoother
 
