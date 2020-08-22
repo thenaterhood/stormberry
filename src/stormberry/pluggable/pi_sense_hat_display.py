@@ -32,6 +32,7 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
 
         self._sense_hat = None
         self._latest_reading = None
+        self.current_index = 0
 
     def prepare(self, config, data_manager):
         """Activates sensors by requesting first values and assigning handlers."""
@@ -43,13 +44,6 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
             data_manager.store_entity('pi-sense-hat', self._sense_hat)
         except:
             self._sense_hat = data_manager.get_entity('pi-sense-hat')
-
-        # Scroll Init message over HAT screen
-        self._show_message('Init Sensors', (255, 255, 0), (0, 0, 255))
-
-        # Init sensors, to be sure first effective run uses correct sensors values
-        self._sense_hat.get_humidity()
-        self._sense_hat.get_pressure()
 
         # Setup Sense Hat stick
         self._sense_hat.stick.direction_up = self._change_weather_entity

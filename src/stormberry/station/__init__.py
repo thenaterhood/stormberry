@@ -66,15 +66,15 @@ class WeatherStation():
 
     def report_reading(self, reading):
 
+        if self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
+            for display in self.plugin_manager.getPluginsOfCategory('Display'):
+                display.plugin_object.update(reading)
+
         if self._latest_reading is None and self.config.getboolean("GENERAL", "DISCARD_FIRST_READING"):
             return
 
         for repo in self.plugin_manager.getPluginsOfCategory('Repository'):
             repo.plugin_object.store_reading(reading)
-
-        if self.config.getboolean("GENERAL", "UPDATE_DISPLAY"):
-            for display in self.plugin_manager.getPluginsOfCategory('Display'):
-                display.plugin_object.update(reading)
 
     def _periodic_callback(self):
 
