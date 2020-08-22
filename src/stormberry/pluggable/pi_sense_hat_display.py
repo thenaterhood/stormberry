@@ -58,10 +58,6 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
         self._sense_hat.stick.direction_right = self._change_weather_entity
         self._sense_hat.stick.direction_middle = self._toggle_display
 
-        """Launches multiple threads to handle configured behavior."""
-        if self.config.getboolean("GENERAL", "UPDATE_DISPLAY") and self.config.getint("GENERAL", "UPDATE_INTERVAL"):
-            self._update_display()
-
         return True
 
     def shutdown(self):
@@ -89,8 +85,6 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
                 new_update_display = not old_update_display
                 self.config.set("GENERAL", "UPDATE_DISPLAY", str(new_update_display))
 
-        self._update_display(loop=False)
-
     def _change_weather_entity(self, event):
         """Internal. Switches to next/previous weather entity or next/previous visual style."""
 
@@ -108,8 +102,6 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
                 self.current_item.previous_item
             else:
                 self.current_item.next_item
-
-        self._update_display(loop=False)
 
     def _show_message(self, message, message_color=(255,255,255), background_color=(0, 0, 0)):
         """Internal. Shows message by scrolling it over HAT screen."""
