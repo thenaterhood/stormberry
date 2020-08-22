@@ -70,7 +70,7 @@ class RPiSenseHatDisplay(stormberry.plugin.IDisplayPlugin, CarouselContainer):
 
     @property
     def carousel_items(self):
-        return DEFAULT_WEATHER_ENTITIES
+        return (TemperatureEntity(self.config), HumidityEntity(self.config), PressureEntity(self.config))
 
     @property
     def current_style(self):
@@ -400,9 +400,6 @@ class WeatherEntity(CarouselContainer):
 class HumidityEntity(WeatherEntity):
     """Humidity enity implementation."""
 
-    def __init__(self):
-        super(HumidityEntity, self).__init__()
-
     @property
     def entity_messsage(self):
         return 'Humidity'
@@ -430,9 +427,6 @@ class HumidityEntity(WeatherEntity):
 class PressureEntity(WeatherEntity):
     """Pressure enity implementation."""
 
-    def __init__(self):
-        super(PressureEntity, self).__init__()
-
     @property
     def entity_messsage(self):
         return 'Pressure'
@@ -452,9 +446,6 @@ class PressureEntity(WeatherEntity):
 class TemperatureEntity(WeatherEntity):
     """Temperature enity implementation."""
 
-    def __init__(self):
-        super(TemperatureEntity, self).__init__()
-
     @property
     def entity_messsage(self):
         return 'Temperature'
@@ -471,5 +462,3 @@ class TemperatureEntity(WeatherEntity):
     def entity_type(self):
         return WeatherEntityType.TEMPERATURE
 
-# Predefined weather entities tuple
-DEFAULT_WEATHER_ENTITIES = (TemperatureEntity(), HumidityEntity(), PressureEntity())
