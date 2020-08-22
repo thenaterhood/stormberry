@@ -1,6 +1,6 @@
 [Core]
 Name = Wunderground Uploader
-Module = wunderground
+Module = stormberry.pluggable.wunderground
 
 [Documentation]
 Author = Uladzislau Bayouski

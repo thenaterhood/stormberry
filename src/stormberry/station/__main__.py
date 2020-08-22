@@ -1,9 +1,11 @@
-from stormberry import Config
+from stormberry.config import Config
 import logging, logging.handlers
 import signal
 import sys
-from stormberry import WeatherStation
+from stormberry.station import WeatherStation
+from stormberry.plugin import ISensorPlugin, IRepositoryPlugin, IDisplayPlugin, PluginDataManager
 from yapsy.PluginManager import PluginManager
+
 
 class SignalHandling(object):
     """
@@ -52,20 +54,30 @@ def main():
     plugin_manager.setPluginPlaces(
             [config.get("GENERAL", "PLUGIN_DIRECTORY")]
             )
+
+    plugin_manager.setCategoriesFilter({
+        'Sensor': ISensorPlugin,
+        'Repository': IRepositoryPlugin,
+        'Display': IDisplayPlugin
+    })
+
     plugin_manager.collectPlugins()
     plugins = plugin_manager.getAllPlugins()
     logger.info("Loaded %d plugins" % len(plugins))
-
     # Make sure we don't have an upload interval more than 3600 seconds
     if config.getint("GENERAL", "UPLOAD_INTERVAL") > 3600:
         logger.error('The application\'s upload interval cannot be greater than 3600 seconds')
 
         sys.exit(1)
 
+    plugin_data_manager = PluginDataManager()
     try:
-        station = WeatherStation(plugin_manager, config, logger)
+        station = WeatherStation(plugin_manager, config, plugin_data_manager, logger)
 
         station.activate_sensors()
+        station.activate_repositories()
+        station.activate_displays()
+
         logger.info('Successfully initialized sensors')
 
         with SignalHandling(station) as sh:

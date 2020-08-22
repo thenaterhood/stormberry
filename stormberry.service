@@ -3,6 +3,7 @@ Description=stormberry weather station service
 After=network.target
 
 [Service]
+User=rouser
 ExecStart=/usr/local/bin/stormberry
 Restart=always
 ExecStop=/bin/kill -s QUIT $MAINPID

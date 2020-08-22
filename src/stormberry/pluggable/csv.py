@@ -1,14 +1,13 @@
 import csv
 import os
-from stormberry.GenericPlugin import GenericPlugin
-from yapsy.IPlugin import IPlugin
+from stormberry.plugin import IRepositoryPlugin
 
-class CSVWriter(GenericPlugin, IPlugin):
+class CSVWriter(IRepositoryPlugin):
 
-    def set_config(self, config):
+    def activate(self, config, data_manager):
         self.config = config
 
-    def save_data(self, data, first_time=False):
+    def store_reading(self, data):
 
         behaviour = self.config['CSV']['BEHAVIOUR']
         filename = self.config['CSV']['FILENAME']
@@ -35,3 +34,7 @@ class CSVWriter(GenericPlugin, IPlugin):
                 'dewpointc': data.dewpointc
                 })
 
+        return True
+
+    def health_check(self):
+        return os.access(self.config['CSV']['FILENAME'], os.W_OK)

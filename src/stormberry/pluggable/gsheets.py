@@ -2,11 +2,10 @@ import logging
 import gspread
 import json
 from oauth2client.service_account import ServiceAccountCredentials
-from stormberry.GenericPlugin import GenericPlugin
-from yapsy.IPlugin import IPlugin
+from stormberry.plugin import IRepositoryPlugin
 
 
-class GSheetUploader(IPlugin, GenericPlugin):
+class GSheetUploader(IRepositoryPlugin):
     '''
     Based on code from https://www.hackster.io/idreams/make-a-mini-weather-station-with-a-raspberry-pi-447866
     '''
@@ -27,7 +26,7 @@ class GSheetUploader(IPlugin, GenericPlugin):
         except Exception as e:
             logging.error("Unable to access google sheet:" + str(e))
 
-    def save_data(self, data, first_time=False):
+    def store_reading(self, data):
 
         if self.worksheet is None:
             self.worksheet = self._open_worksheet(
@@ -43,7 +42,9 @@ class GSheetUploader(IPlugin, GenericPlugin):
                     data.pressure_inHg,
                     data.dewpointc
                     ))
+            return True
         except Exception as e:
             logging.warning("Error appending to google sheet: " + str(e))
             self.worksheet = None
+            return False
 

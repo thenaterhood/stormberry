@@ -1,14 +1,13 @@
 import sqlite3
 import os
-from stormberry.GenericPlugin import GenericPlugin
-from yapsy.IPlugin import IPlugin
+from stormberry.plugin import IRepositoryPlugin
 
-class SQLite3Store(GenericPlugin, IPlugin):
+class SQLite3Store(IRepositoryPlugin):
 
     create_query = "CREATE TABLE IF NOT EXISTS weather_data(id INTEGER PRIMARY KEY ASC, timestr, tempc, inchesHg, humidity, dewpointc)"
     insert_query = "INSERT INTO weather_data(timestr, tempc, inchesHg, humidity, dewpointc) VALUES (:timestr, :tempc, :inchesHg, :humidity, :dewpointc)"
 
-    def save_data(self, data, first_time=False):
+    def store_reading(self, data, first_time=False):
 
         filename = self.config.get('SQLITE', 'FILENAME')
 
@@ -29,3 +28,7 @@ class SQLite3Store(GenericPlugin, IPlugin):
         db.commit()
         db.close()
 
+        return True
+
+    def health_check(self):
+        return os.access(self.config.get('SQLITE', 'FILENAME'), os.W_OK)

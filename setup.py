@@ -3,22 +3,28 @@
 from setuptools import setup
 import sys
 import os
+import glob
 
 install_requires = [
     'sense-hat',
+    'yapsy'
     ]
 
 test_requires = [
     ]
 
+yapsy_files = glob.glob('src/stormberry/pluggable/*.*')
+
 data_files =[
-        ('etc/stormberry', ['config.ini']),
-        ('lib/stormberry/plugins', ['README.md'])
+        ('/etc/stormberry', ['config.ini']),
+        ('/lib/stormberry/plugins_available', ['README.md']),
+        ('/lib/stormberry/plugins_enabled', ['README.md']),
+        ('/lib/stormberry/plugins_available', yapsy_files)
         ]
 
 
 setup(name='stormberry',
-    version='0.1.0',
+    version='1.0.0',
     description='Raspberry Pi weather station with plugins',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
@@ -27,14 +33,16 @@ setup(name='stormberry',
     tests_require=test_requires,
     entry_points={
         'console_scripts': [
-            'stormberry = stormberry.__main__:main'
+            'stormberry = stormberry.station.__main__:main'
         ]
     },
     test_suite='nose.collector',
     package_dir={'':'src'},
     packages=[
         'stormberry',
-        'stormberry.plugin_examples'
+        'stormberry.station',
+        'stormberry.plugin',
+        'stormberry.pluggable'
         ],
     data_files=data_files,
     package_data={

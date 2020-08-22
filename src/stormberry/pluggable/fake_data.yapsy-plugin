@@ -1,0 +1,9 @@
+[Core]
+Name = Fake/demo sensor data plugin
+Module = fake_data
+
+[Documentation]
+Author = Nate Levesque
+Version = 0.1
+Website = http://github.com/thenaterhood/stormberry
+Description = Plugin that provides fake sensor data for testing

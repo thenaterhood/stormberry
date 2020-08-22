@@ -1,31 +1,49 @@
+from datetime import datetime
+
+
 class WeatherReading():
 
     READINGS_PRINT_TEMPLATE = 'Temp: %sC (%sF), Humidity: %s%%, Pressure: %s inHg'
 
-    def __init__(self, tempc, humidity, pressure, date):
+    def __init__(self, tempc, humidity, pressure, date=None):
         self.__tempc = tempc
         self.__humidity = humidity
         self.__pressure = pressure
-        self.__date = date
+        self.__date = date if date is not None else datetime.now()
 
     @property
     def tempc(self):
+        if self.__tempc is None:
+            return None
+
         return round(self.__tempc, 2)
 
     @property
     def tempf(self):
+        if self.__tempc is None:
+            return None
+
         return round((self.__tempc * 1.8) + 32, 2)
 
     @property
     def pressure_millibars(self):
+        if self.__pressure is None:
+            return None
+
         return round(self.__pressure, 2)
 
     @property
     def pressure_inHg(self):
+        if self.__pressure is None:
+            return None
+
         return round(self.__pressure * 0.0295300, 2)
 
     @property
     def humidity(self):
+        if self.__humidity is None:
+            return None
+
         return round(self.__humidity, 2)
 
     @property
@@ -68,6 +86,11 @@ class WeatherReading():
                 'dewpointc': self.dewpointc
                 }
 
+    def merge(self, weather_reading):
+        self.__date = self.__date if self.__date is not None else weather_reading.timestamp
+        self.__tempc = self.__tempc if self.__tempc is not None else weather_reading.tempc
+        self.__humidity = self.__humidity if self.__humidity is not None else weather_reading.humidity
+        self.__pressure = self.__pressure if self.__pressure is not None else weather_reading.pressure_millibars
+
     def __str__(self):
         return (self.READINGS_PRINT_TEMPLATE % self.tuple)
-
