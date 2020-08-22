@@ -61,7 +61,7 @@ class WeatherStation():
             if reading is not None:
                 final_reading.merge(reading)
 
-        self.log.info("New reading: " + str(final_reading))
+        self.log.debug("New reading: " + str(final_reading))
         return final_reading
 
     def report_reading(self, reading):
