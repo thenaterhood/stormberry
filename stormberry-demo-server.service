@@ -1,0 +1,14 @@
+[Unit]
+Description=stormberry demo server
+After=network.target
+
+[Service]
+User=rouser
+ExecStart=/usr/local/bin/stormberry-demo-server
+Restart=always
+ExecStop=/bin/kill -s QUIT $MAINPID
+TimeoutStopSec=6
+
+[Install]
+Alias=stormberry-demo-server.service
+WantedBy=multi-user.target
