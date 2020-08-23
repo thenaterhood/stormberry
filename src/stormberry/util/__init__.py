@@ -5,3 +5,4 @@ def c_to_f(temp):
 def weather_list_to_dict_list(weather_list):
     return [x.dict for x in weather_list]
 
+
