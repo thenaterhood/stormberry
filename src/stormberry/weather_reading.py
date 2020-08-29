@@ -13,8 +13,12 @@ class WeatherReading():
             date=None,
             pressureInchesHg=None,
             wind_mph=None,
-            pm_2_5=None
+            pm_2_5=None,
+            precipitation_cm=None,
+            noise_dB=None
             ):
+
+        self.__reading = dict()
 
         if pressureMillibars is not None:
             self.__pressure = pressureMillibars
@@ -28,6 +32,16 @@ class WeatherReading():
         self.__date = date if date is not None else datetime.now()
         self.__wind_mph = wind_mph
         self.__pm_2_5 = pm_2_5
+        self.__precipitation_cm = precipitation_cm
+        self.__noise_dB = noise_dB
+
+    @property
+    def noise_dB(self):
+        return self.__noise_dB
+
+    @property
+    def precipitation_cm(self):
+        return self.__precipitation_cm
 
     @property
     def pm_2_5(self):
@@ -100,7 +114,9 @@ class WeatherReading():
                 self.humidity,
                 self.pressure_inHg,
                 self.wind_mph,
-                self.pm_2_5
+                self.pm_2_5,
+                self.precipitation_cm,
+                self.noise_dB
                 )
 
     @property
@@ -113,7 +129,9 @@ class WeatherReading():
                 'inchesHg' : self.pressure_inHg,
                 'dewpointc': self.dewpointc,
                 'wind_mph': self.wind_mph,
-                'pm_2_5': self.pm_2_5
+                'pm_2_5': self.pm_2_5,
+                'precipitation_cm': self.precipitation_cm,
+                'noise_dB': self.noise_dB
                 }
 
     def merge(self, weather_reading):
@@ -123,6 +141,8 @@ class WeatherReading():
         self.__pressure = self.__pressure if self.__pressure is not None else weather_reading.pressure_millibars
         self.__wind_mph = self.__wind_mph if self.__wind_mph is not None else weather_reading.wind_mph
         self.__pm_2_5 = self.__pm_2_5 if self.__pm_2_5 is not None else weather_reading.pm_2_5
+        self.__precipitation_cm = self.__precipitation_cm if self.__precipitation_cm is not None else weather_reading.__precipitation_cm
+        self.__noise_dB = self.__noise_dB if self.__noise_dB is not None else weather_reading.noise_dB
 
     def __str__(self):
         return (self.READINGS_PRINT_TEMPLATE % self.tuple)
