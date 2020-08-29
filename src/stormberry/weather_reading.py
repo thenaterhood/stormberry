@@ -13,6 +13,7 @@ class WeatherReading():
             date=None,
             pressureInchesHg=None,
             wind_mph=None,
+            pm_2_5=None
             ):
 
         if pressureMillibars is not None:
@@ -26,6 +27,11 @@ class WeatherReading():
         self.__humidity = humidity
         self.__date = date if date is not None else datetime.now()
         self.__wind_mph = wind_mph
+        self.__pm_2_5 = pm_2_5
+
+    @property
+    def pm_2_5(self):
+        return self.__pm_2_5
 
     @property
     def tempc(self):
@@ -93,7 +99,8 @@ class WeatherReading():
                 self.tempf,
                 self.humidity,
                 self.pressure_inHg,
-                self.wind_mph
+                self.wind_mph,
+                self.pm_2_5
                 )
 
     @property
@@ -105,7 +112,8 @@ class WeatherReading():
                 'humidity': self.humidity,
                 'inchesHg' : self.pressure_inHg,
                 'dewpointc': self.dewpointc,
-                'wind_mph': self.wind_mph
+                'wind_mph': self.wind_mph,
+                'pm_2_5': self.pm_2_5
                 }
 
     def merge(self, weather_reading):
@@ -114,6 +122,7 @@ class WeatherReading():
         self.__humidity = self.__humidity if self.__humidity is not None else weather_reading.humidity
         self.__pressure = self.__pressure if self.__pressure is not None else weather_reading.pressure_millibars
         self.__wind_mph = self.__wind_mph if self.__wind_mph is not None else weather_reading.wind_mph
+        self.__pm_2_5 = self.__pm_2_5 if self.__pm_2_5 is not None else weather_reading.pm_2_5
 
     def __str__(self):
         return (self.READINGS_PRINT_TEMPLATE % self.tuple)
