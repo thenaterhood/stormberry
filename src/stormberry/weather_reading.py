@@ -123,16 +123,22 @@ class WeatherReading():
     def dict(self):
         return {
                 'timestr': self.timestr,
+                'datetime': self.__date,
                 'tempc': self.tempc,
                 'tempf': self.tempf,
                 'humidity': self.humidity,
                 'inchesHg' : self.pressure_inHg,
                 'dewpointc': self.dewpointc,
+                'dewpointf': self.dewpointf,
                 'wind_mph': self.wind_mph,
                 'pm_2_5': self.pm_2_5,
                 'precipitation_cm': self.precipitation_cm,
                 'noise_dB': self.noise_dB
                 }
+
+    @property
+    def fields(self):
+        return self.dict.keys()
 
     def merge(self, weather_reading):
         self.__date = self.__date if self.__date is not None else weather_reading.timestamp
