@@ -80,7 +80,7 @@ def grafana_query():
                 "target": target,
                 "datapoints": readings['dewpointf']
             })
-        elif target == "Humidity":
+        elif target == "Outdoor Humidity":
             reply_data.append({
                 "target": target,
                 "datapoints": readings['humidity']
