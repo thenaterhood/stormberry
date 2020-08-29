@@ -49,4 +49,7 @@ def demo():
 
     app.logger.removeHandler(default_handler)
     app.logger.info("Starting stormberry-server")
+
+    repository = get_repository()
+    app.logger.info("Using storage plugin %s" % repository.__class__.__name__)
     app.run(port=port, host='0.0.0.0')
