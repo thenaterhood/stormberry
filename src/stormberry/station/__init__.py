@@ -52,7 +52,7 @@ class WeatherStation():
         final_reading = WeatherReading()
 
         for sensor in self.plugin_manager.getPluginsOfCategory(PluginTypeName.SENSOR):
-            if self._latest_reading is not None and sensor.plugin_object.in_operating_range(self._latest_reading):
+            if self._latest_reading is not None and not sensor.plugin_object.in_operating_range(self._latest_reading):
                 self.log.info("Sensor plugin %s reports we're outside operating range. Skipping." % str(sensor.plugin_object.__class__.__name__))
                 continue
 
