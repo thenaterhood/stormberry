@@ -1,0 +1,9 @@
+[Core]
+Name = SDS011_Serial
+Module = sds011_serial
+
+[Documentation]
+Author = Nate Levesque
+Version = 0.1
+Website = http://github.com/thenaterhood/stormberry
+Description = Reads data from the SDS011 PM sensor
