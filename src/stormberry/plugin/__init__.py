@@ -125,6 +125,17 @@ class ISensorPlugin(IPlugin):
         '''
         pass
 
+    def in_operating_range(self, weather_reading):
+        '''
+        Whether we're outside the operating or accuracy range
+        of the sensor. By default this returns True.
+
+        This method recives the _previous_ weather reading
+        the station has available. If this method returns
+        False, the sensor will not be read by the station.
+        '''
+        return True
+
     def get_reading(self):
         '''
         Assemble and return a weather reading
