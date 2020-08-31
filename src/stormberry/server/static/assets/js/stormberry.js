@@ -58,6 +58,7 @@ stormberry = {
 
             $('.sc-method').text(data.method);
             $('.sc-value').text(data.comfort_safety_value.toFixed(1));
+            $('.sc-value-f').text(stormberry.ctof(data.comfort_safety_value).toFixed(1))
         });
     },
 
