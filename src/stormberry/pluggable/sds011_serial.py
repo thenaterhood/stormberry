@@ -5,8 +5,9 @@ from stormberry.weather_reading import WeatherReading
 
 class SDS011_Serial(stormberry.plugin.ISensorPlugin):
 
-    def prepare(self, config):
+    def prepare(self, config, data_manager):
 
+        self.data_manager = data_manager
         self.config = config
         self.serial_device_name = config.get('SDS011', 'TTY')
 
@@ -35,7 +36,7 @@ class SDS011_Serial(stormberry.plugin.ISensorPlugin):
     def get_reading(self):
 
         if self.device is None:
-            self.prepare(self.config)
+            self.prepare(self.config, self.data_manager)
 
         if self.device is None:
             return None
@@ -47,7 +48,7 @@ class SDS011_Serial(stormberry.plugin.ISensorPlugin):
             sensor_data.append(data)
 
         pm_2_5 = int.from_bytes(b''.join(sensor_data[2:4]), byteorder="little")
-        pm_10 = int.frombytes(b''.join(sensor_data[4:6]), byteorder="little")
+        pm_10 = int.from_bytes(b''.join(sensor_data[4:6]), byteorder="little")
 
         return WeatherReading(
                 pm_2_5=pm_2_5,
