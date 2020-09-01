@@ -123,7 +123,7 @@ class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
                 tempc=row[2],
                 pressureInchesHg=row[3],
                 humidity=row[4],
-                pm_2_5=row[5],
-                pm_10=row[6]
+                pm_2_5=row[6],
+                pm_10=row[7]
             )
 
