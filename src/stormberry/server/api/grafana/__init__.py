@@ -22,7 +22,8 @@ def transform_readings_to_series(readings, fields=None):
             if k not in transformed:
                 transformed[k] = []
 
-            transformed[k].append([r.dict[k], grafana_ts])
+            if r.dict[k] is not None:
+                transformed[k].append([r.dict[k], grafana_ts])
 
     return transformed
 
@@ -49,7 +50,7 @@ def grafana_search():
 def grafana_query():
     req = request.get_json()
     repo = get_repository()
-    target = req['targets'][0]['target']
+    dataPointLimit = -1 * req.maxDataPoints
 
     reply_data = []
 
@@ -65,32 +66,32 @@ def grafana_query():
         if target == "Outdoor Temperature (C)":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['tempc']
+                "datapoints": readings['tempc'][dataPointLimit:]
             })
         elif target == "Outdoor Temperature (F)":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['tempf']
+                "datapoints": readings['tempf'][dataPointLimit:]
             })
         elif target == "Outdoor Dewpoint (C)":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['dewpointc']
+                "datapoints": readings['dewpointc'][dataPointLimit:]
             })
         elif target == "Outdoor Dewpoint (F)":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['dewpointf']
+                "datapoints": readings['dewpointf'][dataPointLimit:]
             })
         elif target == "Outdoor Humidity":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['humidity']
+                "datapoints": readings['humidity'][dataPointLimit:]
             })
         elif target == "Barometer":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['inchesHg']
+                "datapoints": readings['inchesHg'][dataPointLimit:]
             })
         elif target == "Outdoor Safety (C)":
             reply_data.append({
@@ -105,12 +106,12 @@ def grafana_query():
         elif target == "Particulate Matter (2.5)":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['pm_2_5']
+                "datapoints": readings['pm_2_5'][dataPointLimit:]
             })
         elif target == "Particulate Matter (10)":
             reply_data.append({
                 "target": target,
-                "datapoints": readings['pm_10']
+                "datapoints": readings['pm_10'][dataPointLimit:]
             })
 
 
