@@ -50,7 +50,7 @@ def grafana_search():
 def grafana_query():
     req = request.get_json()
     repo = get_repository()
-    dataPointLimit = -1 * req.maxDataPoints
+    dataPointLimit = -1 * req['maxDataPoints']
 
     reply_data = []
 
