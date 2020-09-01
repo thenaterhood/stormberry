@@ -40,7 +40,9 @@ def grafana_search():
         "Outdoor Humidity",
         "Barometer",
         "Outdoor Safety (C)",
-        "Outdoor Safety (F)"
+        "Outdoor Safety (F)",
+        "Particulate Matter (2.5)",
+        "Particulate Matter (10)",
         ])
 
 @grafana_blueprint.route('/query', methods = ['POST'])
@@ -100,6 +102,17 @@ def grafana_query():
                 "target": target,
                 "datapoints": [[stormberry.util.c_to_f(comfort['comfort_safety_value']), now_grafana_ts]]
             })
+        elif target == "Particulate Matter (2.5)":
+            reply_data.append({
+                "target": target,
+                "datapoints": readings['pm_2_5']
+            })
+        elif target == "Particulate Matter (10)":
+            reply_data.append({
+                "target": target,
+                "datapoints": readings['pm_10']
+            })
+
 
     return jsonify(reply_data)
 

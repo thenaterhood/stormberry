@@ -5,6 +5,7 @@ from stormberry.server.api.grafana import grafana_blueprint
 from stormberry.server.api.weather import weather_blueprint
 from stormberry.server.api.forecast import forecast_blueprint
 from stormberry.server.api.comfort import comfort_blueprint
+from stormberry.server.api.pollution import pollution_blueprint
 from stormberry.server.util import get_repository
 from stormberry.config import Config
 import stormberry.logging
@@ -16,6 +17,7 @@ app.register_blueprint(grafana_blueprint, url_prefix="/api/grafana")
 app.register_blueprint(weather_blueprint, url_prefix="/weather")
 app.register_blueprint(forecast_blueprint, url_prefix="/predict")
 app.register_blueprint(comfort_blueprint, url_prefix="/comfort")
+app.register_blueprint(pollution_blueprint, url_prefix="/api/pollution")
 
 @app.route('/')
 def send_index():
