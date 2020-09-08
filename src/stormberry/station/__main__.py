@@ -1,7 +1,7 @@
 from stormberry.config import Config
-import logging, logging.handlers
 import signal
 import sys
+import stormberry.logging
 from stormberry.station import WeatherStation
 from stormberry.plugin import ISensorPlugin, IRepositoryPlugin, IDisplayPlugin, PluginDataManager
 from stormberry.plugin.manager import get_plugin_manager
@@ -25,57 +25,17 @@ class SignalHandling(object):
         # that's needed right now, so we'll do nothing.
         pass
 
-def set_handler_level_from_str(logger, level_name):
-    try:
-        logger.setLevel(level_name.upper())
-    except:
-        logger.setLevel(logging.CRITICAL)
-
 def main():
     config = Config()
-    log_level = logging.INFO
-    try:
-        cfg_console_log_level = config.get("GENERAL", "CONSOLE_LOG_LEVEL")
-    except:
-        cfg_console_log_level = "Critical"
 
     try:
-        cfg_file_log_level = config.get("GENERAL", "FILE_LOG_LEVEL")
+        logdir = config.get("GENERAL", "LOGDIR")
     except:
-        cfg_file_log_level = "Info"
+        logdir = "/tmp"
 
-    stormberry_logger = logging.getLogger('stormberry-station')
-    stormberry_logger.setLevel(logging.DEBUG)
-
-    yapsy_logger = logging.getLogger('yapsy')
-    yapsy_logger.setLevel(logging.DEBUG)
-
-    try:
-        filehandler = logging.handlers.TimedRotatingFileHandler(
-                filename=config.get("GENERAL", "LOGFILE"),
-                when="W0"
-                )
-    except:
-        filehandler = logging.handlers.TimedRotatingFileHandler(
-                filename="/tmp/stormberry.log",
-                when="W0"
-                )
-    termhandler = logging.StreamHandler(sys.stdout)
-    termhandler.setLevel(logging.INFO)
-
-    formatter = logging.Formatter("%(asctime)s [%(levelname)s][%(name)s]:%(message)s",
-            "%Y-%m-%d %H:%M:%S")
-    filehandler.setFormatter(formatter)
-    termhandler.setFormatter(formatter)
-
-    stormberry_logger.addHandler(filehandler)
-    stormberry_logger.addHandler(termhandler)
-
-    yapsy_logger.addHandler(filehandler)
-    yapsy_logger.addHandler(termhandler)
-
-    set_handler_level_from_str(filehandler, cfg_file_log_level)
-    set_handler_level_from_str(termhandler, cfg_console_log_level)
+    filehandler, termhandler = stormberry.logging.setup_handlers(logdir, "stormberry-station.log")
+    stormberry_logger = stormberry.logging.setup_logging(config, "stormberry-station", [filehandler, termhandler])
+    yapsy_logger = stormberry.logging.setup_logging(config, "yapsy", [filehandler, termhandler])
 
     plugin_manager = get_plugin_manager(config)
 

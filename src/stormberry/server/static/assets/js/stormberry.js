@@ -58,6 +58,7 @@ stormberry = {
 
             $('.sc-method').text(data.method);
             $('.sc-value').text(data.comfort_safety_value.toFixed(1));
+            $('.sc-value-f').text(stormberry.ctof(data.comfort_safety_value).toFixed(1))
         });
     },
 
@@ -124,13 +125,13 @@ stormberry = {
 
 
             for (var i = 0, len = data.length; i < len; i++) {
-                dewpointLabels.push(data[i].datestr);
+                dewpointLabels.push(data[i].timestr);
                 dewpointValues.push(parseFloat(data[i].dewpointc));
 
-                tempLabels.push(data[i].datestr);
+                tempLabels.push(data[i].timestr);
                 tempValues.push(data[i].tempc);
 
-                pressureLabels.push(data[i].datestr);
+                pressureLabels.push(data[i].timestr);
                 pressureValues.push(data[i].inchesHg);
             }
             dewpointData = {

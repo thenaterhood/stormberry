@@ -6,8 +6,8 @@ from stormberry.weather_reading import WeatherReading
 
 class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
 
-    create_query = "CREATE TABLE IF NOT EXISTS weather_data(id INTEGER PRIMARY KEY ASC, timestr, tempc, inchesHg, humidity, dewpointc)"
-    insert_query = "INSERT INTO weather_data(timestr, tempc, inchesHg, humidity, dewpointc) VALUES (:timestr, :tempc, :inchesHg, :humidity, :dewpointc)"
+    create_query = "CREATE TABLE IF NOT EXISTS weather_data(id INTEGER PRIMARY KEY ASC, timestr, tempc, inchesHg, humidity, dewpointc, pm_2_5, pm_10)"
+    insert_query = "INSERT INTO weather_data(timestr, tempc, inchesHg, humidity, dewpointc, pm_2_5, pm_10) VALUES (:timestr, :tempc, :inchesHg, :humidity, :dewpointc, :pm_2_5, :pm_10)"
 
     def prepare(self, config, data_manager):
 
@@ -40,7 +40,9 @@ class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
                 'tempc' : data.tempc,
                 'dewpointc' : data.dewpointc,
                 'humidity' : data.humidity,
-                'inchesHg' : data.pressure_inHg
+                'inchesHg' : data.pressure_inHg,
+                'pm_2_5': data.pm_2_5,
+                'pm_10': data.pm_10
                 }
 
         db.execute(self.insert_query, insert_data)
@@ -73,7 +75,7 @@ class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
 
     def get_mean_between(self, start_time, end_time = None):
         if end_time is None:
-            query = "SELECT AVG(tempc), AVG(humidity), AVG(dewpointc) FROM weather_data WHERE timestr >= Datetime(?)"
+            query = "SELECT AVG(tempc), AVG(humidity), AVG(dewpointc), AVG(pm_2_5), AVG(pm_10) FROM weather_data WHERE timestr >= Datetime(?)"
             self.cursor.execute(query, (start_time,))
         else:
             query = "SELECT AVG(tempc), AVG(humidity), AVG(dewpointc) FROM weather_data WHERE timestr >= Datetime(?) AND timestr <= Datetime(?)"
@@ -83,17 +85,19 @@ class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
         averages = {
                 'tempc_avg': result[0],
                 'humidity_avg': result[1],
-                'dewpointc_avg': result[2]
+                'dewpointc_avg': result[2],
+                'pm2_5_avg': result[3],
+                'pm_10_avg': result[4],
                 }
 
         return averages
 
     def get_extremes_between(self, start_time, end_time = None):
         if end_time is None:
-            query = "SELECT MIN(tempc), MAX(tempc), MIN(humidity), MAX(humidity), MIN(dewpointc), MAX(dewpointc) FROM weather_data WHERE timestr >= Datetime(?)"
+            query = "SELECT MIN(tempc), MAX(tempc), MIN(humidity), MAX(humidity), MIN(dewpointc), MAX(dewpointc), MIN(pm_2_5), MAX(pm_2_5), MIN(pm_10), MAX(pm_10) FROM weather_data WHERE timestr >= Datetime(?)"
             self.cursor.execute(query, (start_time,))
         else:
-            query = "SELECT MIN(tempc), MAX(tempc), MIN(humidity), MAX(humidity), MIN(dewpointc), MAX(dewpointc) FROM weather_data WHERE timestr >= Datetime(?) AND timestr <= Datetime(?)"
+            query = "SELECT MIN(tempc), MAX(tempc), MIN(humidity), MAX(humidity), MIN(dewpointc), MAX(dewpointc), MIN(pm_2_5), MAX(pm_2_5), MIN(pm_10), MAX(pm_10) FROM weather_data WHERE timestr >= Datetime(?) AND timestr <= Datetime(?)"
             self.cursor.execute(query, (start_time, end_time))
             result = self.cursor.fetchone()
 
@@ -103,7 +107,11 @@ class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
                 'humidity_min': result[2],
                 'humidity_max': result[3],
                 'dewpointc_min': result[4],
-                'dewpointc_max': result[5]
+                'dewpointc_max': result[5],
+                'pm_2_5_min': result[6],
+                'pm_2_5_max': result[7],
+                'pm_10_min': result[8],
+                'pm_10_max': result[9],
                 }
 
         return extremes
@@ -115,5 +123,7 @@ class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
                 tempc=row[2],
                 pressureInchesHg=row[3],
                 humidity=row[4],
+                pm_2_5=row[6],
+                pm_10=row[7]
             )
 
