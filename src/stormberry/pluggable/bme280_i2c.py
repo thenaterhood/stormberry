@@ -8,6 +8,8 @@ except ImportError:
 
 from bme280 import BME280
 
+# See https://github.com/pimoroni/enviroplus-python
+# pip3 install enviroplus
 
 class BME280_I2C(stormberry.plugin.ISensorPlugin):
 
@@ -31,7 +33,7 @@ class BME280_I2C(stormberry.plugin.ISensorPlugin):
                     pressure_hectopascal=pressure
                     )
             return wr
-        except:
+        except Exception as e:
             print(e)
             return None
 
