@@ -1,5 +1,6 @@
 from flask import Flask, send_from_directory
 from flask.logging import default_handler
+from flask_cors import CORS
 
 from stormberry.server.api.grafana import grafana_blueprint
 from stormberry.server.api.weather import weather_blueprint
@@ -54,4 +55,5 @@ def demo():
 
     repository = get_repository()
     app.logger.info("Using storage plugin %s" % repository.__class__.__name__)
+    CORS(app)
     app.run(port=port, host='0.0.0.0')

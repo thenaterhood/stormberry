@@ -7,7 +7,9 @@ import glob
 
 install_requires = [
     'sense-hat',
-    'yapsy'
+    'yapsy',
+    'flask',
+    'flask_cors'
     ]
 
 test_requires = [
