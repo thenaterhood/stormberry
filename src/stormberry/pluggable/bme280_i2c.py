@@ -1,6 +1,11 @@
 import stormberry.plugin
 from stormberry.weather_reading import WeatherReading
-from smbus2 import SMBus
+
+try:
+    from smbus2 import SMBus
+except ImportError:
+    from smbus import SMBus
+
 from bme280 import BME280
 
 
