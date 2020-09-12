@@ -16,7 +16,8 @@ class WeatherReading():
             pm_2_5=None,
             pm_10=None,
             precipitation_cm=None,
-            noise_dB=None
+            noise_dB=None,
+            pressure_hectopascal=None
             ):
 
         self.__reading = dict()
@@ -25,6 +26,9 @@ class WeatherReading():
             self.__pressure = pressureMillibars
         elif pressureInchesHg is not None:
             self.__pressure = pressureInchesHg / 0.029530
+        elif pressure_hectopascal is not None:
+            # yes, these are equal
+            self.__pressure = pressure_hectopascal
         else:
             self.__pressure = None
 

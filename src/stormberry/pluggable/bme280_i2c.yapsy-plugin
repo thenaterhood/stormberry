@@ -1,0 +1,9 @@
+[Core]
+Name = BME280_I2C
+Module = bme280_i2c
+
+[Documentation]
+Author = Nate Levesque
+Version = 0.1
+Website = http://github.com/thenaterhood/stormberry
+Description = Reads data from a BME280 humidity, pressure, and temp sensor over i2c
