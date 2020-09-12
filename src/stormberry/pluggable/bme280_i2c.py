@@ -36,7 +36,7 @@ class BME280_I2C(stormberry.plugin.ISensorPlugin):
         try:
             tempc = self.bme280.get_temperature()
             if self.compensate_temp:
-                tempc = self.compensate_temp(tempc)
+                tempc = self.compensate_temperature(tempc)
 
             pressure = self.bme280.get_pressure()
             humidity = self.bme280.get_humidity()
