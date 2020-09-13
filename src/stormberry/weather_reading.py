@@ -50,7 +50,7 @@ class WeatherReading():
        return self.__globe_temp_c
 
    @property
-    def wet_bulb_temp_c(self):
+   def wet_bulb_temp_c(self):
         if self.__wet_bulb_temp_c is not None:
             return self.__wet_bulb_temp_c
 
