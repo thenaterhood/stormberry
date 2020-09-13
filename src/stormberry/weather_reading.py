@@ -17,7 +17,9 @@ class WeatherReading():
             pm_10=None,
             precipitation_cm=None,
             noise_dB=None,
-            pressure_hectopascal=None
+            pressure_hectopascal=None,
+            wet_bulb_temp_c=None,
+            globe_temp_c=None
             ):
 
         self.__reading = dict()
@@ -40,6 +42,41 @@ class WeatherReading():
         self.__pm_10 = pm_10
         self.__precipitation_cm = precipitation_cm
         self.__noise_dB = noise_dB
+        self.__wet_bulb_temp_c = wet_bulb_temp_c
+        self.__globe_temp_c = globe_temp_c
+
+   @property
+   def globe_temp_c(self):
+       return self.__globe_temp_c
+
+   @property
+    def wet_bulb_temp_c(self):
+        if self.__wet_bulb_temp_c is not None:
+            return self.__wet_bulb_temp_c
+
+        if self.__humidity is None or self.__tempc is None:
+            return None
+
+        # From https://www.weather.gov/media/tsa/pdf/WBGTpaper2.pdf
+        return (-5.806 + 0.672 * self.tempc – 0.006 * (self.tempc**2) +(0.061 + 0.004 * self.tempc + 99*10-6 * (self.tempc**2)) * self.humidity + (-33*10-6 –5*10-6 *self.tempc–1*10-7 * (self.tempc**2)) * (self.humidity**2))
+
+    @property
+    def wet_bulb_globe_temp_c(self):
+        '''
+        This is generally calculated rather than directly measured because
+        the equipment to measure it is expensive.
+        '''
+        wet_bulb = self.wet_bulb_temp_c
+        if wet_bulb is None:
+            return None
+
+        if self.tempc is None:
+            return None
+
+        if self.globe_temp_c is None:
+            return (0.7 * wet_bulb + 0.3 * self.tempc)
+        else:
+            return (0.7 * wet_bulb + 0.2 * self.globe_temp_c + 0.1 self.tempc
 
     @property
     def noise_dB(self):
@@ -174,3 +211,10 @@ class WeatherReading():
 
     def __str__(self):
         return (self.READINGS_PRINT_TEMPLATE % self.tuple[0:5])
+
+    def ctof(self, celsius):
+        return (celsius * 1.8) + 32
+
+    def ftoc(self, f):
+        return (f - 32) / 1.8
+

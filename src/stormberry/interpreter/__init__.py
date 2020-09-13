@@ -108,28 +108,12 @@ class WeatherInterpreter:
         windchill = self.windchill()
         dewpoint_comfort = self.dewpoint_comfort()
         tempc = latest_reading.tempc
+        wbgt = latest_reading.wet_bulb_globe_temp_c
 
-        comfort_safety_value = None
-        comfort_safety_method = None
+        comfort_safety_value = wbgt
+        comfort_safety_method = 'wet-bulb-globe-temperature'
         comfort_safety_str = None
         activity_safety = None
-
-        if (tempc > 26.7):
-            comfort_safety_value = heat_index
-            comfort_safety_method = 'heat-index'
-        elif (tempc >= 15 and tempc <= 26.7):
-            # Humidex is unitless, but is often reported as
-            # the degrees C the weather feels like, so we'll
-            # do the same.
-            comfort_safety_value = humidex
-            comfort_safety_method = 'humidex'
-        elif (windchill is not None):
-            comfort_safety_value = windchill
-            comfort_safety_method = 'windchill'
-        else:
-            comfort_safety_method = 'tempc'
-            comfort_safety_value = tempc
-
         # This is based on a combination of humidex values,
         # heat index, and this random child safety weather
         # chart: http://www.c-uphd.org/documents/wellness/weatherwatch.pdf
@@ -164,6 +148,7 @@ class WeatherInterpreter:
         return {
                 'humidex': humidex,
                 'heat_index': heat_index,
+                'wbgt': wbgt,
                 'windchill': windchill,
                 'dewpoint_comfort': dewpoint_comfort,
                 'comfort_safety_str': comfort_safety_str,
