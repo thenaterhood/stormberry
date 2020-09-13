@@ -58,7 +58,7 @@ class WeatherReading():
             return None
 
         # From https://www.weather.gov/media/tsa/pdf/WBGTpaper2.pdf
-        return (-5.806 + 0.672 * self.tempc – 0.006 * (self.tempc**2) +(0.061 + 0.004 * self.tempc + 99*10-6 * (self.tempc**2)) * self.humidity + (-33*10-6 –5*10-6 *self.tempc–1*10-7 * (self.tempc**2)) * (self.humidity**2))
+        return (-5.806 + 0.672 * self.tempc - 0.006 * (self.tempc**2) +(0.061 + 0.004 * self.tempc + 99*(10**-6) * (self.tempc**2)) * self.humidity + (-33*(10**-6) -5*(10**-6) *self.tempc-1*(10**-7) * (self.tempc**2)) * (self.humidity**2))
 
     @property
     def wet_bulb_globe_temp_c(self):
@@ -76,7 +76,7 @@ class WeatherReading():
         if self.globe_temp_c is None:
             return (0.7 * wet_bulb + 0.3 * self.tempc)
         else:
-            return (0.7 * wet_bulb + 0.2 * self.globe_temp_c + 0.1 self.tempc
+            return (0.7 * wet_bulb + 0.2 * self.globe_temp_c + 0.1*self.tempc)
 
     @property
     def noise_dB(self):
