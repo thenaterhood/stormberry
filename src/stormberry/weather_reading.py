@@ -106,7 +106,7 @@ class WeatherReading():
         if self.__tempc is None:
             return None
 
-        return round((self.__tempc * 1.8) + 32, 2)
+        return self.ctof(self.tempc)
 
     @property
     def pressure_millibars(self):
@@ -159,8 +159,41 @@ class WeatherReading():
         return self.tempf - (100 - self.__humidity) / 5
 
     @property
+    def humidex_c(self):
+        if self.humidity is None or self.dewpointc is None:
+            return None
+
+        t = self.tempc
+        d = self.dewpointc
+        # Approximation of math constant e
+        e = 2.71828
+
+        humidex = t + 0.5555 * (6.11* math.exp(5417.7530*(1/273.16 - 1/(273.15+d)))-10)
+
+        return humidex
+
+    @property
     def wind_mph(self):
         return self.__wind_mph
+
+    def windchill_c(self):
+        t = self.tempf
+        if t is None:
+            return None
+
+        if self.wind_mph is not None:
+            v = self.wind_mph
+        else:
+            v = 3.5 # average walking speed, assuming no other wind
+
+        windchill = 35.74 + 0.6215*t - 35.75*(v**0.16) + 0.4275*t*(v**0.16)
+
+        # If windchill calculates to higher than the air temperature,
+        # the equation is not valid for our conditions.
+        if windchill > t:
+            return None
+        else:
+            return self.ftoc(windchill)
 
     @property
     def tuple(self):
@@ -208,6 +241,7 @@ class WeatherReading():
         self.__precipitation_cm = self.__precipitation_cm if self.__precipitation_cm is not None else weather_reading.__precipitation_cm
         self.__noise_dB = self.__noise_dB if self.__noise_dB is not None else weather_reading.noise_dB,
         self.__pm_10 = self.__pm_10 if self.__pm_10 is not None else weather_reading.pm_10
+        self.__wet_bulb_temp_c = self.__wet_bulb_temp_c if self.__wet_bulb_temp_c is not None else weather_reading.wet_bulb_temp_c
 
     def __str__(self):
         return (self.READINGS_PRINT_TEMPLATE % self.tuple[0:5])

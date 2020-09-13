@@ -68,33 +68,6 @@ class WeatherInterpreter:
 
         return self.ftoc(heat_index)
 
-    def windchill(self):
-        latest_reading = self.repo.get_latest()
-        t = self.ctof(latest_reading.tempc)
-        if latest_reading.wind_mph is not None:
-            v = latest_reading.wind_mph
-        else:
-            v = 1
-        windchill = 35.74 + 0.6215*t - 35.75*(v**0.16) + 0.4275*t*(v**0.16)
-
-        # If windchill calculates to higher than the air temperature,
-        # the equation is not valid for our conditions.
-        if windchill > t:
-            return None
-        else:
-            return self.ftoc(windchill)
-
-    def humidex(self):
-        latest_reading = self.repo.get_latest()
-        t = latest_reading.tempc
-        d = latest_reading.dewpointc
-        # Approximation of math constant e
-        e = 2.71828
-
-        humidex = t + 0.5555 * (6.11* math.exp(5417.7530*(1/273.16 - 1/(273.15+d)))-10)
-
-        return humidex
-
     def comfort_safety(self):
         '''
         This is a combined interpretation using windchill, heat index,
@@ -103,9 +76,9 @@ class WeatherInterpreter:
         '''
         latest_reading = self.repo.get_latest()
 
-        humidex = self.humidex()
+        humidex = latest_reading.humidex_c
         heat_index = self.heat_index()
-        windchill = self.windchill()
+        windchill = latest_reading.windchill_c
         dewpoint_comfort = self.dewpoint_comfort()
         tempc = latest_reading.tempc
         wbgt = latest_reading.wet_bulb_globe_temp_c
