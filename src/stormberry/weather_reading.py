@@ -213,6 +213,7 @@ class WeatherReading():
     def wind_mph(self):
         return self.__wind_mph
 
+    @property
     def windchill_c(self):
         t = self.tempf
         if t is None:

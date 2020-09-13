@@ -21,6 +21,7 @@ class SQLite3Store(stormberry.plugin.IRepositoryPlugin):
             return False
 
         self.cursor = self.db.cursor()
+        return True
 
     def shutdown(self):
         if self.db is not None:

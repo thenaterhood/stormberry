@@ -34,6 +34,8 @@ class BME280_I2C(stormberry.plugin.ISensorPlugin):
         except:
             self.compensate_temp_factor = 2.25
 
+        return True
+
     def get_reading(self):
 
         try:

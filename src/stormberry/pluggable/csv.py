@@ -6,6 +6,7 @@ class CSVWriter(stormberry.plugin.IRepositoryPlugin):
 
     def prepare(self, config, data_manager):
         self.config = config
+        return True
 
     def store_reading(self, data):
 
