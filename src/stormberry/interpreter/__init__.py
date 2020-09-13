@@ -35,39 +35,6 @@ class WeatherInterpreter:
         else:
             return 'very-dry'
 
-    def heat_index(self):
-        weather_reading = self.repo.get_latest()
-
-        # Formula is from https://en.wikipedia.org/wiki/Heat_index
-        c1 = -42.379
-        c2 = 2.04901523
-        c3 = 10.14333127
-        c4 = -0.22475541
-        c5 = -6.83783e-3
-        c6 = -5.481717e-2
-        c7 = 1.22874e-3
-        c8 = 8.5282e-4
-        c9 = -1.99e-6
-        t = self.ctof(weather_reading.tempc)
-        r = weather_reading.humidity
-        # Below 80, the heat index is not valid using this equation
-        if (t < 80):
-            return None
-
-        heat_index = math.fsum([
-            c1,
-            c2*t,
-            c3*r,
-            c4*t*r,
-            c5*(t**2),
-            c6*(r**2),
-            c7*r*(t**2),
-            c8*t*(r**2),
-            c9*(t**2)*(r**2)
-            ])
-
-        return self.ftoc(heat_index)
-
     def comfort_safety(self):
         '''
         This is a combined interpretation using windchill, heat index,
@@ -77,7 +44,7 @@ class WeatherInterpreter:
         latest_reading = self.repo.get_latest()
 
         humidex = latest_reading.humidex_c
-        heat_index = self.heat_index()
+        heat_index = latest_reading.heat_index_c
         windchill = latest_reading.windchill_c
         dewpoint_comfort = self.dewpoint_comfort()
         tempc = latest_reading.tempc

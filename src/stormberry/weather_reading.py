@@ -1,4 +1,5 @@
 from datetime import datetime
+import math
 
 
 class WeatherReading():
@@ -171,6 +172,42 @@ class WeatherReading():
         humidex = t + 0.5555 * (6.11* math.exp(5417.7530*(1/273.16 - 1/(273.15+d)))-10)
 
         return humidex
+
+    @property
+    def heat_index_c(self):
+        # Formula is from https://en.wikipedia.org/wiki/Heat_index
+        c1 = -42.379
+        c2 = 2.04901523
+        c3 = 10.14333127
+        c4 = -0.22475541
+        c5 = -6.83783e-3
+        c6 = -5.481717e-2
+        c7 = 1.22874e-3
+        c8 = 8.5282e-4
+        c9 = -1.99e-6
+        t = self.tempf
+        r = self.humidity
+
+        if t is None or r is None:
+            return None
+
+        # Below 80, the heat index is not valid using this equation
+        if (t < 80):
+            return None
+
+        heat_index = math.fsum([
+            c1,
+            c2*t,
+            c3*r,
+            c4*t*r,
+            c5*(t**2),
+            c6*(r**2),
+            c7*r*(t**2),
+            c8*t*(r**2),
+            c9*(t**2)*(r**2)
+            ])
+
+        return self.ftoc(heat_index)
 
     @property
     def wind_mph(self):
