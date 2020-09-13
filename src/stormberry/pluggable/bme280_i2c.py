@@ -78,7 +78,7 @@ class BME280_I2C(stormberry.plugin.ISensorPlugin):
     def compensate_humidity(self, raw_hum, raw_temp, comp_temp):
         # This is based on code from https://forums.pimoroni.com/t/enviro-readings-unrealiable/12754/58
 
-        comp_hum_slope = 0.6 # Linear Regression to adjust temperature-adjusted raw relative humidity to provide compensated relative humidity
+        comp_hum_slope = 0.966 # Linear Regression to adjust temperature-adjusted raw relative humidity to provide compensated relative humidity
         comp_hum_intercept = 15.686
 
         dew_point = (243.04 * (math.log(raw_hum / 100) + ((17.625 * raw_temp) / (243.04 + raw_temp)))) / (17.625 - math.log(raw_hum / 100) - (17.625 * raw_temp / (243.04 + raw_temp)))
