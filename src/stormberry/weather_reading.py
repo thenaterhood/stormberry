@@ -45,12 +45,12 @@ class WeatherReading():
         self.__wet_bulb_temp_c = wet_bulb_temp_c
         self.__globe_temp_c = globe_temp_c
 
-   @property
-   def globe_temp_c(self):
-       return self.__globe_temp_c
+    @property
+    def globe_temp_c(self):
+        return self.__globe_temp_c
 
-   @property
-   def wet_bulb_temp_c(self):
+    @property
+    def wet_bulb_temp_c(self):
         if self.__wet_bulb_temp_c is not None:
             return self.__wet_bulb_temp_c
 
