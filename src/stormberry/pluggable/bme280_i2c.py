@@ -1,5 +1,6 @@
 import stormberry.plugin
 from stormberry.weather_reading import WeatherReading
+import math
 
 try:
     from smbus2 import SMBus
@@ -23,23 +24,33 @@ class BME280_I2C(stormberry.plugin.ISensorPlugin):
         self.cpu_temps = [self.get_cpu_temperature()] * 5
         try:
             self.compensate_temp = self.config.getboolean("BME280", "CPU_COMPENSATE")
+            self.compensate_hum = self.compensate_temp
         except:
             self.compensate_temp = True
+            self.compensate_hum = True
 
         try:
-            self.compensate_temp_factor = self.config.getint("BME280", "CPU_COMPENSATION_FACTOR")
+            self.compensate_temp_factor = self.config.getfloat("BME280", "CPU_COMPENSATION_FACTOR")
         except:
             self.compensate_temp_factor = 2.25
 
     def get_reading(self):
 
         try:
-            tempc = self.bme280.get_temperature()
+            raw_tempc = self.bme280.get_temperature()
+            raw_humidity = self.bme280.get_humidity()
+
             if self.compensate_temp:
-                tempc = self.compensate_temperature(tempc)
+                tempc = self.compensate_temperature(raw_tempc)
+            else:
+                tempc = raw_tempc
+
+            if self.compensate_hum:
+                humidity = self.compensate_humidity(raw_humidity, raw_tempc, tempc)
+            else:
+                humidity = raw_humidity
 
             pressure = self.bme280.get_pressure()
-            humidity = self.bme280.get_humidity()
 
             wr = WeatherReading(
                     tempc=tempc,
@@ -63,4 +74,17 @@ class BME280_I2C(stormberry.plugin.ISensorPlugin):
         avg_cpu_temp = sum(self.cpu_temps) / float(len(self.cpu_temps))
         comp_temp = raw_temp - ((avg_cpu_temp - raw_temp) / self.compensate_temp_factor)
         return comp_temp
+
+    def compensate_humidity(self, raw_hum, raw_temp, comp_temp):
+        # This is based on code from https://forums.pimoroni.com/t/enviro-readings-unrealiable/12754/58
+
+        comp_hum_slope = 0.6 # Linear Regression to adjust temperature-adjusted raw relative humidity to provide compensated relative humidity
+        comp_hum_intercept = 15.686
+
+        dew_point = (243.04 * (math.log(raw_hum / 100) + ((17.625 * raw_temp) / (243.04 + raw_temp)))) / (17.625 - math.log(raw_hum / 100) - (17.625 * raw_temp / (243.04 + raw_temp)))
+        temp_adjusted_hum = 100 * (math.exp((17.625 * dew_point)/(243.04 + dew_point)) / math.exp((17.625 * comp_temp) / (243.04 + comp_temp)))
+        comp_hum = comp_hum_slope * temp_adjusted_hum + comp_hum_intercept
+
+        return comp_hum
+
 
