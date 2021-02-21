@@ -31,7 +31,7 @@ data_files =[
 
 
 setup(name='stormberry',
-    version='1.1.0',
+    version='1.2.0',
     description='Raspberry Pi weather station with plugins',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
