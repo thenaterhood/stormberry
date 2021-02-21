@@ -31,7 +31,13 @@ class StormberryUpload(stormberry.plugin.IRepositoryPlugin):
         previous_values.append(reading)
         still_pending_readings = []
 
+        failed = False
+
         for v in previous_values:
+            if failed:
+                still_pending_readings.append(v)
+                continue
+
             try:
                 endpoint = self.config.get('STORMBERRY_UPLOAD', 'URL')
                 token = self.config.get('STORMBERRY_UPLOAD', 'TOKEN')
@@ -49,8 +55,8 @@ class StormberryUpload(stormberry.plugin.IRepositoryPlugin):
                 urllib.request.urlopen(request)
             except urllib.error.URLError as e:
                 still_pending_readings.append(v)
-                logging.warning("stormberry upload failed: " + str(e.reason))
-                break
+                logging.warning("stormberry upload failed (%d pending): %s" % (len(previous_values), str(e.reason)))
+                failed = True
 
         self.data_manager.store_entity('readings_pending_upload', still_pending_readings)
         return True
