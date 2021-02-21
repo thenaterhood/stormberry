@@ -7,6 +7,7 @@ from stormberry.server.api.weather import weather_blueprint
 from stormberry.server.api.forecast import forecast_blueprint
 from stormberry.server.api.comfort import comfort_blueprint
 from stormberry.server.api.pollution import pollution_blueprint
+from stormberry.server.api.upload import upload_blueprint
 from stormberry.server.util import get_repository
 from stormberry.config import Config
 import stormberry.logging
@@ -37,6 +38,13 @@ def demo():
     port = None
 
     try:
+        enable_uploads = config.get("SERVER", "ENABLE_UPLOADS")
+        upload_token = config.get("SERVER", "UPLOAD_TOKEN")
+    except:
+        enable_uploads = False
+        upload_token = ""
+
+    try:
         port = config.get("SERVER", "PORT")
     except:
         pass
@@ -49,6 +57,9 @@ def demo():
     filehandler, termhandler = stormberry.logging.setup_handlers(logdir, "stormberry-server.log")
     stormberry.logging.setup_logging(config, "stormberry-server", [filehandler, termhandler], app.logger)
     stormberry.logging.setup_logging(config, "werkzeug", [filehandler, termhandler])
+
+    if enable_uploads:
+        app.register_blueprint(upload_blueprint, url_prefix="/api/upload")
 
     app.logger.removeHandler(default_handler)
     app.logger.info("Starting stormberry-server")

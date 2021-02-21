@@ -1,0 +1,9 @@
+[Core]
+Name = Stormberry Upload
+Module = stormberry_upload
+
+[Documentation]
+Author = Nate Levesque
+Version = 0.1
+Website = http://github.com/thenaterhood/stormberry
+Description = Plugin that uploads weather readings to a stormberry server
