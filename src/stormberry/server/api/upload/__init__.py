@@ -33,7 +33,7 @@ def upload_reading():
         humidity = request.form.get('humidity', type=float),
         pressureMillibars = request.form.get('pressureMillibars', type=float),
         date = reading_time,
-        pressureInchesHg = request.form.get('pressureInchesHg', type=float),
+        pressureInchesHg = request.form.get('inchesHg', type=float),
         wind_mph = request.form.get('wind_mph', type=float),
         pm_2_5 = request.form.get('pm_2_5', type=float),
         pm_10 = request.form.get('pm_10', type=float),
