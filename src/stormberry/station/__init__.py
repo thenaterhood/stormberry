@@ -25,16 +25,22 @@ class WeatherStation():
 
     def prepare_sensors(self):
         for sensor in self.plugin_manager.getPluginsOfCategory(PluginTypeName.SENSOR):
-            sensor.plugin_object.prepare(self.config, self.plugin_data_manager)
+            if not sensor.plugin_object.prepare(self.config, self.plugin_data_manager):
+                self.log.warning("Failed to prepare %s, disabling", sensor.plugin_object.__class__.__name__)
+                self.plugin_manager.removePluginFromCategory(sensor, PluginTypeName.SENSOR)
 
     def prepare_repositories(self):
         for repo in self.plugin_manager.getPluginsOfCategory(PluginTypeName.REPOSITORY):
-            repo.plugin_object.prepare(self.config, self.plugin_data_manager)
+            if not repo.plugin_object.prepare(self.config, self.plugin_data_manager):
+                self.log.warning("Failed to prepare %s, disabling", repo.plugin_object.__class__.__name__)
+                self.plugin_manager.removePluginFromCategory(repo, PluginTypeName.REPOSITORY)
 
     def prepare_displays(self):
         if self.config.getboolean("GENERAL", "ENABLE_DISPLAY"):
             for display in self.plugin_manager.getPluginsOfCategory(PluginTypeName.DISPLAY):
-                display.plugin_object.prepare(self.config, self.plugin_data_manager)
+                if not display.plugin_object.prepare(self.config, self.plugin_data_manager):
+                    self.log.warning("Failed to prepare %s, disabling", display.plugin_object.__class__.__name__)
+                    self.plugin_manager.removePluginFromCategory(display, PluginTypeName.DISPLAY)
 
     def start_station(self):
         """Launches multiple threads to handle configured behavior."""

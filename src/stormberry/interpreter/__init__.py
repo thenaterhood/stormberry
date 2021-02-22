@@ -35,66 +35,6 @@ class WeatherInterpreter:
         else:
             return 'very-dry'
 
-    def heat_index(self):
-        weather_reading = self.repo.get_latest()
-
-        # Formula is from https://en.wikipedia.org/wiki/Heat_index
-        c1 = -42.379
-        c2 = 2.04901523
-        c3 = 10.14333127
-        c4 = -0.22475541
-        c5 = -6.83783e-3
-        c6 = -5.481717e-2
-        c7 = 1.22874e-3
-        c8 = 8.5282e-4
-        c9 = -1.99e-6
-        t = self.ctof(weather_reading.tempc)
-        r = weather_reading.humidity
-        # Below 80, the heat index is not valid using this equation
-        if (t < 80):
-            return None
-
-        heat_index = math.fsum([
-            c1,
-            c2*t,
-            c3*r,
-            c4*t*r,
-            c5*(t**2),
-            c6*(r**2),
-            c7*r*(t**2),
-            c8*t*(r**2),
-            c9*(t**2)*(r**2)
-            ])
-
-        return self.ftoc(heat_index)
-
-    def windchill(self):
-        latest_reading = self.repo.get_latest()
-        t = self.ctof(latest_reading.tempc)
-        if latest_reading.wind_mph is not None:
-            v = latest_reading.wind_mph
-        else:
-            v = 1
-        windchill = 35.74 + 0.6215*t - 35.75*(v**0.16) + 0.4275*t*(v**0.16)
-
-        # If windchill calculates to higher than the air temperature,
-        # the equation is not valid for our conditions.
-        if windchill > t:
-            return None
-        else:
-            return self.ftoc(windchill)
-
-    def humidex(self):
-        latest_reading = self.repo.get_latest()
-        t = latest_reading.tempc
-        d = latest_reading.dewpointc
-        # Approximation of math constant e
-        e = 2.71828
-
-        humidex = t + 0.5555 * (6.11* math.exp(5417.7530*(1/273.16 - 1/(273.15+d)))-10)
-
-        return humidex
-
     def comfort_safety(self):
         '''
         This is a combined interpretation using windchill, heat index,
@@ -103,33 +43,17 @@ class WeatherInterpreter:
         '''
         latest_reading = self.repo.get_latest()
 
-        humidex = self.humidex()
-        heat_index = self.heat_index()
-        windchill = self.windchill()
+        humidex = latest_reading.humidex_c
+        heat_index = latest_reading.heat_index_c
+        windchill = latest_reading.windchill_c
         dewpoint_comfort = self.dewpoint_comfort()
         tempc = latest_reading.tempc
+        wbgt = latest_reading.wet_bulb_globe_temp_c
 
-        comfort_safety_value = None
-        comfort_safety_method = None
+        comfort_safety_value = wbgt
+        comfort_safety_method = 'wet-bulb-globe-temperature'
         comfort_safety_str = None
         activity_safety = None
-
-        if (tempc > 26.7):
-            comfort_safety_value = heat_index
-            comfort_safety_method = 'heat-index'
-        elif (tempc >= 15 and tempc <= 26.7):
-            # Humidex is unitless, but is often reported as
-            # the degrees C the weather feels like, so we'll
-            # do the same.
-            comfort_safety_value = humidex
-            comfort_safety_method = 'humidex'
-        elif (windchill is not None):
-            comfort_safety_value = windchill
-            comfort_safety_method = 'windchill'
-        else:
-            comfort_safety_method = 'tempc'
-            comfort_safety_value = tempc
-
         # This is based on a combination of humidex values,
         # heat index, and this random child safety weather
         # chart: http://www.c-uphd.org/documents/wellness/weatherwatch.pdf
@@ -164,6 +88,7 @@ class WeatherInterpreter:
         return {
                 'humidex': humidex,
                 'heat_index': heat_index,
+                'wbgt': wbgt,
                 'windchill': windchill,
                 'dewpoint_comfort': dewpoint_comfort,
                 'comfort_safety_str': comfort_safety_str,

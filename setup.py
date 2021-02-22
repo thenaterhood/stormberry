@@ -6,8 +6,9 @@ import os
 import glob
 
 install_requires = [
-    'sense-hat',
-    'yapsy'
+    'yapsy',
+    'Flask',
+    'flask_cors'
     ]
 
 test_requires = [
@@ -30,7 +31,7 @@ data_files =[
 
 
 setup(name='stormberry',
-    version='1.1.0',
+    version='1.2.0',
     description='Raspberry Pi weather station with plugins',
     author='Nate Levesque',
     author_email='public@thenaterhood.com',
@@ -57,6 +58,7 @@ setup(name='stormberry',
         'stormberry.server.api.comfort',
         'stormberry.server.api.weather',
         'stormberry.server.api.pollution',
+        'stormberry.server.api.upload',
         'stormberry.station',
         'stormberry.plugin',
         'stormberry.pluggable',

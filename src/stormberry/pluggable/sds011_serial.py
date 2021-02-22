@@ -16,6 +16,8 @@ class SDS011_Serial(stormberry.plugin.ISensorPlugin):
         except serial.serialutil.SerialException as e:
             self.device = None
 
+        return True
+
     def shutdown(self):
         if self.device is not None:
             try:

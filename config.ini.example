@@ -69,3 +69,16 @@ FILENAME=stormberry.db
 GDOCS_OAUTH_JSON=/usr/local/etc/stormberry/gdocs_oauth.json
 GDOCS_SPREADSHEET_NAME=Stormberry Weather Readings
 
+[STORMBERRY_UPLOAD]
+;The trailing slash matters
+;URL=weather_server:5000/api/upload/
+;Must match the server token on the remote device
+;TOKEN=
+
+[SERVER]
+;PORT=5000
+;Allow the server to receive and store weather readings. Useful if your
+;server and sensors are running on separate devices.
+;ENABLE_UPLOADS=False
+;Change this value if you're using uploads. Empty is not allowed.
+;UPLOAD_TOKEN=
