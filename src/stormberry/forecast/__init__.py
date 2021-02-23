@@ -25,7 +25,7 @@ class WeatherForecaster:
         readings = self.repo.get_between(datestr)
 
         if len(readings) < 2:
-            return None
+            raise Exception(str(readings))
 
         pressures = [x.pressure_inHg for x in readings]
         times = [x.timestamp.timestamp() for x in readings]
