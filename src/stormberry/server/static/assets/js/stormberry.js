@@ -56,6 +56,10 @@ stormberry = {
 
     displayLatestCondition: function(){
         $.getJSON('/weather/latest-reading', {}, function(data) {
+            if (!data) {
+                return;
+            }
+
             $('.current-temp').text(data.tempc.toFixed(1));
             $('.current-temp-f').text(stormberry.ctof(data.tempc).toFixed(1));
             $('.current-humidity').text(data.humidity);
@@ -68,6 +72,10 @@ stormberry = {
 
     displayLatestComfort: function(){
         $.getJSON('/comfort/now', {}, function(data) {
+            if (!data) {
+                return;
+            }
+
             if (weather_descriptions.hasOwnProperty(data.comfort_safety_str)) {
                     $('.current-comfort').text(weather_descriptions[data.comfort_safety_str]);
             } else {
@@ -90,6 +98,10 @@ stormberry = {
 
     displayBasicPrediction: function(){
         $.getJSON('/predict/basic', {}, function(data) {
+            if (!data) {
+                return;
+            }
+
             if (forecast_descriptions.hasOwnProperty(data.prediction)) {
                     $('.basic-prediction').text(forecast_descriptions[data.prediction]);
             } else {
@@ -140,6 +152,10 @@ stormberry = {
 
 
         $.getJSON('/weather/past-day', {}, function(data) {
+            if (!data) {
+                return;
+            }
+
             var dewpointLabels = [];
             var dewpointValues = [];
 
@@ -186,6 +202,10 @@ stormberry = {
 
     displayWeeklyTrends: function(){
         $.getJSON('/weather/past-week/trend', {}, function(data) {
+            if (!data) {
+                return;
+            }
+
             temp_icon = 'trending_flat';
             if (data.tempc_trend < 0) {
                 temp_icon = 'trending_down';
@@ -219,6 +239,10 @@ stormberry = {
 
 
         $.getJSON('/weather/past-week', {}, function(data) {
+            if (!data) {
+                return;
+            }
+
             var dewpointLabels = [];
             var dewpointValues = [];
 
