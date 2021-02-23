@@ -20,12 +20,38 @@ forecast_descriptions = {
         "precipitation": "Expect precipitation.",
         "storms": "Possible storms inbound."
 };
+aqi_descriptions = {
+        "good": "Air quality is good.",
+        "moderate": "Moderate, but safe air pollution levels.",
+        "unhealthy-for-sensitive-groups": "Air quality is unhealthy for sensitive individuals.",
+        "unhealthy": "Air quality is unhealthy. Limit exposure.",
+        "very-unhealthy": "Air quality is very unhealthy. Limit exposure.",
+        "hazardous": "Pollution levels are hazardous. Limit exposure as much as possible."
+}
 
 
 stormberry = {
 
     ctof: function(celsius){
         return (celsius * 1.8) + 32;
+    },
+
+    displayEnvironmentQuality: function() {
+        $.getJSON('/api/pollution/now', {}, function(data) {
+            if (data) {
+                if (data.aqi_category) {
+                    if (aqi_descriptions.hasOwnProperty(data.aqi_category)) {
+                        $('.environment-quality').text(
+                            aqi_descriptions[data.aqi_category]
+                        );
+                    } else {
+                        $('.environment-quality').text(
+                            data.aqi_category
+                        );
+                    }
+                }
+            }
+        });
     },
 
     displayLatestCondition: function(){

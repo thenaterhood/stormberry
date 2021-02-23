@@ -23,6 +23,7 @@ if (window.location.protocol != proto && CONFIG.redirect_to_https) {
         <p><span class="current-comfort"></span> Current conditions are <span class="current-temp-f"></span>F/<span class="current-temp"></span>C, with humidity <span class="current-humidity"></span>% and dewpoint <span class="current-dewpoint-f"></span>F/<span class="current-dewpoint"></span>C.</p>
         <p><span class="basic-prediction"></span> <span class="basic-temp-trend"></span></p>
         <p><span class="safe-to-run"></span> It feels like <span class="sc-value-f"></span>F/<span class="sc-value"></span>C.</p>
+        <p><span class="environment-quality"></span>
         <hr />
         <h1>24-hour Conditions</h1>
         <div id="hourlyDewpointChart"></div>
@@ -51,6 +52,7 @@ if (window.location.protocol != proto && CONFIG.redirect_to_https) {
                     stormberry.displayLatestComfort();
                     stormberry.displayLatestCondition();
                     stormberry.displayBasicPrediction();
+                    stormberry.displayEnvironmentQuality();
                     stormberry.initConditionCharts();
                     $('.current-conditions').removeClass('hidden');
                     $('.current-conditions-nav').addClass('active');
