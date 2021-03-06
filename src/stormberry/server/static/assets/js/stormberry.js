@@ -52,6 +52,8 @@ stormberry = {
         let needlePosition = 70 - comfort_value_f;
         if (comfort_value_f > 70) {
             needlePosition -= 15;
+        } else if (comfort_value_f < 50) {
+            needlePosition += 3;
         }
 
         if (needlePosition > 90) {
