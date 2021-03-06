@@ -36,6 +36,57 @@ stormberry = {
         return (celsius * 1.8) + 32;
     },
 
+    updateComfortVisualization: function() {
+
+        let gaugeNeedle = $(".temp-meter").find("object").contents().find(".gauge-needle")[0];
+
+        if (!stormberry.hasOwnProperty('comfort_safety_value')) {
+            gaugeNeedle.style.display = "none";
+            return;
+        }
+
+        gaugeNeedle.style.display = "block";
+
+        comfort_value_f = stormberry.ctof(stormberry.comfort_safety_value);
+
+        let needlePosition = 70 - comfort_value_f;
+        if (comfort_value_f > 70) {
+            needlePosition -= 15;
+        }
+
+        if (needlePosition > 90) {
+            needlePosition = 90;
+        } else if (needlePosition < -90) {
+            needlePosition = -90;
+        }
+
+        let originalTransform = gaugeNeedle.getAttribute("transform");
+        let newTransform = originalTransform + " rotate(" + needlePosition + ")";
+        gaugeNeedle.setAttribute("transform", newTransform);
+    },
+
+    updateAirVisualization: function() {
+        let gaugeNeedle = $(".safety-meter").find("object").contents().find(".gauge-needle")[0];
+
+        if (!stormberry.hasOwnProperty('air_quality_index')) {
+            gaugeNeedle.style.display = "none";
+            return;
+        }
+        gaugeNeedle.style.display = "block";
+
+        let c = 90;
+        let d = -90;
+        let a = 0;
+        let b = 500;
+        let x = stormberry.air_quality_index;
+
+        let rescale = ((d-c) * (x-a) / (b-a) + c);
+        let needlePosition = rescale;
+        let originalTransform = gaugeNeedle.getAttribute("transform");
+        let newTransform = originalTransform + " rotate(" + needlePosition + ")";
+        gaugeNeedle.setAttribute("transform", newTransform);
+    },
+
     displayEnvironmentQuality: function() {
         $.getJSON('/api/pollution/now', {}, function(data) {
             if (data) {
@@ -49,8 +100,11 @@ stormberry = {
                             data.aqi_category
                         );
                     }
+                    stormberry.air_quality_index = data.aqi
                 }
             }
+
+            stormberry.updateAirVisualization();
         });
     },
 
@@ -90,9 +144,16 @@ stormberry = {
                     $('.safe-to-run').text("It's currently inadvisable to go running.");
             }
 
+            comfort_value_f = stormberry.ctof(data.comfort_safety_value);
+
             $('.sc-method').text(data.method);
             $('.sc-value').text(data.comfort_safety_value.toFixed(1));
-            $('.sc-value-f').text(stormberry.ctof(data.comfort_safety_value).toFixed(1))
+            $('.sc-value-f').text(comfort_value_f.toFixed(1))
+
+            stormberry.comfort_safety_value = data.comfort_safety_value;
+
+            stormberry.updateComfortVisualization();
+            stormberry.updateAirVisualization();
         });
     },
 

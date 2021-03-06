@@ -13,6 +13,23 @@
             <p>This website requires Javascript</p>
         </noscript>
 
+        <div class="padded-bottom-40">
+            <div class="temp-meter meter-container">
+                <object
+                    data="/assets/images/gauge-cold-warm.svg"
+                    width="45%">
+                </object>
+                <h3 class="meter-label">Comfort</h3>
+            </div>
+            <div class="safety-meter meter-container">
+                <object
+                    data="/assets/images/gauge-simple.svg"
+                    width="45%">
+                </object>
+                <h3 class="meter-label">Air Quality</h3>
+            </div>
+        </div>
+
         <p><span class="current-comfort"></span> Current conditions are <span class="current-temp-f"></span>F/<span class="current-temp"></span>C, with humidity <span class="current-humidity"></span>% and dewpoint <span class="current-dewpoint-f"></span>F/<span class="current-dewpoint"></span>C.</p>
         <p><span class="basic-prediction"></span> <span class="basic-temp-trend"></span></p>
         <p><span class="safe-to-run"></span> It feels like <span class="sc-value-f"></span>F/<span class="sc-value"></span>C.</p>
@@ -31,9 +48,6 @@
         });
 
         function preparePage() {
-
-            // Javascript method's body can be found in assets/js/demos.js
-            //            demo.initDashboardPageCharts();
 
             let displaySection = decodeURIComponent(location.hash.substring(1));
             $('.dynamic-item').addClass('hidden');

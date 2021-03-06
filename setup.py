@@ -18,6 +18,7 @@ yapsy_files = glob.glob('src/stormberry/pluggable/*.*')
 server_files = glob.glob('src/stormberry/server/static/*.*')
 js_files = glob.glob('src/stormberry/server/static/assets/js/*.*')
 css_files = glob.glob('src/stormberry/server/static/assets/css/*.*')
+img_files = glob.glob('src/stormberry/server/static/assets/images/*.*')
 
 data_files =[
         ('/etc/stormberry', ['config.ini.example']),
@@ -26,7 +27,8 @@ data_files =[
         ('/lib/stormberry/plugins_available', yapsy_files),
         ('/lib/stormberry/static_files', server_files),
         ('/lib/stormberry/static_files/assets/js', js_files),
-        ('/lib/stormberry/static_files/assets/css', css_files)
+        ('/lib/stormberry/static_files/assets/css', css_files),
+        ('/lib/stormberry/static_files/assets/images', img_files)
         ]
 
 

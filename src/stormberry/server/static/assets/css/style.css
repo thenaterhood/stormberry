@@ -19,3 +19,20 @@ body {
        font-size: 2em;
     }
 }
+
+h3.meter-label {
+    display: inline;
+    position: absolute;
+    left: 140px;
+    top: -10px;
+}
+
+.padded-bottom-40 {
+    padding-bottom: 40px;
+}
+
+.meter-container {
+    display: inline;
+    position: relative;
+}
+
