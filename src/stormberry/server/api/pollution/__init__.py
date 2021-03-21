@@ -92,10 +92,10 @@ def get_quality_between(start, end):
         pm_10_aqi_min = 301
         pm_10_aqi_max = 500
 
-    aqi_pm_2_5 = ((pm_2_5_mean - pm_2_5_min) * (pm_2_5_max - pm_2_5_min)) / (pm_2_5_max - pm_2_5_min)
+    aqi_pm_2_5 = ((pm_2_5_mean - pm_2_5_min) * (pm_2_5_max - pm_2_5_min)) / (pm_2_5_aqi_max - pm_2_5_aqi_min)
     aqi_pm_2_5 = aqi_pm_2_5 + pm_2_5_aqi_min
 
-    aqi_pm_10 = ((pm_10_mean - pm_10_min) * (pm_10_max - pm_10_min)) / (pm_10_max - pm_10_min)
+    aqi_pm_10 = ((pm_10_mean - pm_10_min) * (pm_10_max - pm_10_min)) / (pm_10_aqi_max - pm_10_aqi_min)
     aqi_pm_10 = aqi_pm_10 + pm_10_aqi_min
 
     aqi = max(aqi_pm_2_5, aqi_pm_10)
